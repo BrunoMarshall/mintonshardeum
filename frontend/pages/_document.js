@@ -5,7 +5,7 @@ export default function Document() {
     <Html lang="en">
       <Head>
         <link rel="icon" href="/mintonshardeum_favicon.png" type="image/png" />
-        <link rel="stylesheet" href="/globals.css" />
+        <link rel="stylesheet" href="/styles/globals.css" />
       </Head>
       <body>
         <Main />

@@ -4,4 +4,11 @@
 
 body {
   font-family: 'Inter', sans-serif;
+  margin: 0;
+  background-color: #F7FAFC; /* Soft grey (gray-50) */
+}
+
+.container {
+  margin-left: auto;
+  margin-right: auto;
 }
