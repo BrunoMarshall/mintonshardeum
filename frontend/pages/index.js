@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { ethers } from 'ethers';
 import Header from '../components/Header';
 
 const factoryABI = [
@@ -21,97 +20,89 @@ export default function Home() {
       setStatus('Please fill all fields correctly. Decimals must be 0–18.');
       return;
     }
-    try {
-      setStatus('Connecting to wallet...');
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      const signer = await provider.getSigner();
-      const factory = new ethers.Contract(
-        'FACTORY_ADDRESS', // Replace with your deployed MintonFactory address
-        factoryABI,
-        signer
-      );
-      setStatus('Forging token with Minton...');
-      const tx = await factory.createToken(name, symbol, supply, decimals, isMintable);
-      const receipt = await tx.wait();
-      setStatus(`Minton forged your token at: ${receipt.logs[0].address}`);
-    } catch (error) {
-      setStatus(`Error: ${error.message}`);
-    }
+    setStatus('Connect MetaMask to forge your token.');
+    // Token creation logic will be implemented once contract is deployed
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
+    <div className="min-h-screen bg-gray-100">
       <Header />
-      <h2>Minton’s Token Forge</h2>
-      <p>Minton says: Let’s craft your token on Shardeum!</p>
-      <form>
-        <div style={{ marginBottom: '10px' }}>
-          <label>Token Name: </label>
-          <input
-            type="text"
-            placeholder="e.g., My Token"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={{ width: '100%', padding: '5px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <label>Symbol: </label>
-          <input
-            type="text"
-            placeholder="e.g., MTK"
-            value={symbol}
-            onChange={(e) => setSymbol(e.target.value)}
-            style={{ width: '100%', padding: '5px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <label>Initial Supply: </label>
-          <input
-            type="number"
-            placeholder="e.g., 1000000"
-            value={supply}
-            onChange={(e) => setSupply(e.target.value)}
-            style={{ width: '100%', padding: '5px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <label>Decimals: </label>
-          <input
-            type="number"
-            placeholder="e.g., 18"
-            value={decimals}
-            onChange={(e) => setDecimals(e.target.value)}
-            style={{ width: '100%', padding: '5px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <label>
+      <main className="container mx-auto px-4 py-8">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Minton’s Token Forge</h2>
+        <p className="text-gray-600 mb-6">Minton says: Let’s craft your token on Shardeum!</p>
+        <form className="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto">
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">Token Name</label>
             <input
-              type="checkbox"
-              checked={isMintable}
-              onChange={(e) => setIsMintable(e.target.checked)}
+              type="text"
+              placeholder="e.g., My Token"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            Mintable (Minton can forge more!)
-          </label>
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <label>Network: </label>
-          <select value={network} onChange={(e) => setNetwork(e.target.value)}>
-            <option value="testnet">Shardeum Testnet</option>
-            <option value="mainnet" disabled>Shardeum Mainnet (Coming Soon)</option>
-          </select>
-        </div>
-        <button
-          type="button"
-          onClick={createToken}
-          style={{ padding: '10px 20px', background: '#00b4d8', color: 'white', border: 'none' }}
-        >
-          Forge with Minton!
-        </button>
-      </form>
-      <p>{status}</p>
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">Symbol</label>
+            <input
+              type="text"
+              placeholder="e.g., MTK"
+              value={symbol}
+              onChange={(e) => setSymbol(e.target.value)}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">Initial Supply</label>
+            <input
+              type="number"
+              placeholder="e.g., 1000000"
+              value={supply}
+              onChange={(e) => setSupply(e.target.value)}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">Decimals</label>
+            <input
+              type="number"
+              placeholder="e.g., 18"
+              value={decimals}
+              onChange={(e) => setDecimals(e.target.value)}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={isMintable}
+                onChange={(e) => setIsMintable(e.target.checked)}
+                className="mr-2"
+              />
+              <span className="text-gray-700 font-medium">Mintable (Minton can forge more!)</span>
+            </label>
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">Network</label>
+            <select
+              value={network}
+              onChange={(e) => setNetwork(e.target.value)}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="testnet">Shardeum Testnet</option>
+              <option value="mainnet" disabled>Shardeum Mainnet (Coming Soon)</option>
+            </select>
+          </div>
+          <button
+            type="button"
+            onClick={createToken}
+            className="w-full p-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+          >
+            Forge with Minton!
+          </button>
+        </form>
+        {status && <p className="mt-4 text-center text-gray-700">{status}</p>}
+      </main>
     </div>
   );
 }
