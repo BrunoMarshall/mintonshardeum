@@ -4,6 +4,18 @@ import { ethers } from 'ethers';
 export default function Header() {
   const [walletAddress, setWalletAddress] = useState(null);
 
+  useEffect(() => {
+    const checkConnection = async () => {
+      if (typeof window.ethereum !== 'undefined') {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+          setWalletAddress(accounts[0]);
+        }
+      }
+    };
+    checkConnection();
+  }, []);
+
   const connectWallet = async () => {
     if (typeof window.ethereum !== 'undefined') {
       try {
@@ -14,6 +26,7 @@ export default function Header() {
         setWalletAddress(address);
       } catch (error) {
         console.error('Wallet connection failed:', error);
+        alert('Failed to connect MetaMask. Please try again.');
       }
     } else {
       alert('Please install MetaMask to connect your wallet.');

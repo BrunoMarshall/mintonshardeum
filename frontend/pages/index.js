@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import Header from '../components/Header';
 
-const factoryABI = [
-  "function createToken(string memory name, string memory symbol, uint256 initialSupply, uint8 decimals, bool isMintable) public returns (address)",
-  "event TokenCreated(address tokenAddress, string name, string symbol, address creator)"
-];
-
 export default function Home() {
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
@@ -20,8 +15,7 @@ export default function Home() {
       setStatus('Please fill all fields correctly. Decimals must be 0–18.');
       return;
     }
-    setStatus('Connect MetaMask to forge your token.');
-    // Token creation logic will be implemented once contract is deployed
+    setStatus('Connect MetaMask and deploy the contract to forge your token.');
   };
 
   return (

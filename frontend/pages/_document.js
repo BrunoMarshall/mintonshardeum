@@ -4,7 +4,7 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        <link rel="icon" href="/mintonshardeum_favicon.png" />
+        <link rel="icon" href="/mintonshardeum_favicon.png" type="image/png" />
         <link rel="stylesheet" href="/globals.css" />
       </Head>
       <body>
