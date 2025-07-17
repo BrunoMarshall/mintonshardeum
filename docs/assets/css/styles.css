@@ -112,8 +112,9 @@ form {
 
 .form-group {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
 }
 
 .form-group label {
@@ -133,6 +134,7 @@ form {
     color: #333333;
     font-weight: 400;
     flex: 1; /* Allow inputs to take remaining space */
+    max-width: 200px; /* Limit input width for better layout */
 }
 
 .form-group input[type="checkbox"] {
@@ -158,7 +160,7 @@ form {
 }
 
 .field-description {
-    font-size: 0.9rem;
+    font-size: 0.63rem; /* 30% reduction from 0.9rem (0.9 * 0.7 = 0.63) */
     color: #666666; /* Lighter grey for descriptions */
     text-align: left;
     margin-top: 5px;
