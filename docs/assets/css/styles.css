@@ -18,15 +18,11 @@ body {
 
 header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     padding: 20px 50px;
     background: #0f0f1f;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-}
-
-.logo img {
-    height: 50px;
 }
 
 nav a {
@@ -61,12 +57,24 @@ nav a:hover {
 main {
     flex: 1;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     padding: 50px;
 }
 
-.minter, .about {
+.logo-section {
+    margin-bottom: 40px;
+}
+
+.logo-section .main-logo {
+    max-width: 100%;
+    height: auto;
+    max-height: 200px; /* Adjust this value to control logo size */
+    display: block;
+    margin: 0 auto;
+}
+
+.minter {
     background: rgba(255, 255, 255, 0.1);
     padding: 40px;
     border-radius: 10px;
@@ -76,7 +84,7 @@ main {
     box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
 }
 
-.minter h1, .about h1 {
+.minter h1 {
     font-family: 'Montserrat', sans-serif; /* Heading font */
     font-size: 2.5rem;
     color: #00ff88;
@@ -84,7 +92,7 @@ main {
     font-weight: 700;
 }
 
-.minter p, .about p {
+.minter p {
     font-size: 1.2rem;
     margin-bottom: 30px;
 }
@@ -130,6 +138,29 @@ form button:hover {
 #status {
     margin-top: 20px;
     color: #00ff88;
+}
+
+.about {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+}
+
+.about h1 {
+    font-family: 'Montserrat', sans-serif; /* Heading font */
+    font-size: 2.5rem;
+    color: #00ff88;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.about p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
 }
 
 .about ul {
