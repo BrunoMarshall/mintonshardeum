@@ -89,6 +89,9 @@ main {
     max-width: 600px;
     width: 100%;
     box-shadow: 0 0 20px rgba(0, 36, 241, 0.1); /* Blue shadow */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the content horizontally */
 }
 
 .minter h1 {
@@ -108,6 +111,7 @@ form {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    width: 100%; /* Ensure form takes full width of minter */
 }
 
 .form-group {
@@ -115,6 +119,7 @@ form {
     flex-direction: row;
     align-items: center;
     gap: 10px;
+    justify-content: center; /* Center the label-input pair */
 }
 
 .form-group label {
@@ -152,7 +157,7 @@ form {
     border: none;
     border-radius: 5px;
     width: auto; /* Button width adjusts to content */
-    align-self: flex-start; /* Align button to start */
+    align-self: center; /* Center the button */
 }
 
 .form-group button:hover {
