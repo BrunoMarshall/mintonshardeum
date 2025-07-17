@@ -112,18 +112,12 @@ form {
 
 .form-group {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.input-row {
-    display: flex;
     flex-direction: row;
     align-items: center;
     gap: 10px;
 }
 
-.input-row label {
+.form-group label {
     font-size: 1.1rem;
     color: #0024F1; /* Blue accent */
     font-weight: 600;
@@ -131,7 +125,7 @@ form {
     min-width: 120px; /* Fixed width for labels to align inputs */
 }
 
-.input-row input, .input-row select {
+.form-group input, .form-group select {
     padding: 10px;
     font-size: 1rem;
     border: none;
@@ -143,7 +137,7 @@ form {
     max-width: 200px; /* Limit input width for better layout */
 }
 
-.input-row input[type="checkbox"] {
+.form-group input[type="checkbox"] {
     width: auto;
     margin-left: 10px; /* Space after label for checkbox */
 }
@@ -166,11 +160,12 @@ form {
 }
 
 .field-description {
-    font-size: 0.63rem; /* 30% reduction from 0.9rem */
+    font-size: 0.63rem; /* 30% reduction from 0.9rem (0.9 * 0.7 = 0.63) */
     color: #666666; /* Lighter grey for descriptions */
     text-align: left;
     margin-top: 5px;
     line-height: 1.4;
+    width: 100%; /* Ensure description takes full width below */
 }
 
 #status {
