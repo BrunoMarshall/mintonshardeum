@@ -8,8 +8,8 @@
 }
 
 body {
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-    color: #e0e0e0;
+    background: #f0f0f5; /* Soft grey background */
+    color: #333333; /* Darker grey text for readability */
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -21,19 +21,19 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 20px 50px;
-    background: #0f0f1f;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    background: #ffffff; /* White header for contrast */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Softer shadow */
 }
 
 .header-title {
     font-family: 'Montserrat', sans-serif; /* Heading font */
     font-size: 1.5rem;
-    color: #00ff88;
+    color: #0024F1; /* Blue accent */
     font-weight: 700;
 }
 
 nav a {
-    color: #00ff88;
+    color: #0024F1; /* Blue accent */
     text-decoration: none;
     margin: 0 20px;
     font-size: 1.2rem;
@@ -42,12 +42,12 @@ nav a {
 }
 
 nav a:hover {
-    color: #00ccff;
+    color: #0018b8; /* Darker blue for hover */
 }
 
 #connect-metamask {
-    background: #00ff88;
-    color: #0f0f1f;
+    background: #0024F1; /* Blue accent */
+    color: #ffffff;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
@@ -58,7 +58,7 @@ nav a:hover {
 }
 
 #connect-metamask:hover {
-    background: #00ccff;
+    background: #0018b8; /* Darker blue for hover */
 }
 
 main {
@@ -82,19 +82,19 @@ main {
 }
 
 .minter {
-    background: rgba(255, 255, 255, 0.1);
+    background: #ffffff; /* White background for form */
     padding: 40px;
     border-radius: 10px;
     text-align: center;
     max-width: 600px;
     width: 100%;
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+    box-shadow: 0 0 20px rgba(0, 36, 241, 0.1); /* Blue shadow */
 }
 
 .minter h1 {
     font-family: 'Montserrat', sans-serif; /* Heading font */
     font-size: 2.5rem;
-    color: #00ff88;
+    color: #0024F1; /* Blue accent */
     margin-bottom: 20px;
     font-weight: 700;
 }
@@ -112,7 +112,7 @@ form {
 
 form label {
     font-size: 1.1rem;
-    color: #00ccff;
+    color: #0024F1; /* Blue accent */
     font-weight: 600;
 }
 
@@ -121,8 +121,8 @@ form input, form select, form button {
     font-size: 1rem;
     border: none;
     border-radius: 5px;
-    background: #2a2a4e;
-    color: #e0e0e0;
+    background: #e0e0e8; /* Light grey for inputs */
+    color: #333333;
     font-weight: 400;
 }
 
@@ -131,36 +131,36 @@ form input[type="checkbox"] {
 }
 
 form button {
-    background: #00ff88;
-    color: #0f0f1f;
+    background: #0024F1; /* Blue accent */
+    color: #ffffff;
     cursor: pointer;
     transition: background 0.3s;
     font-weight: 600;
 }
 
 form button:hover {
-    background: #00ccff;
+    background: #0018b8; /* Darker blue for hover */
 }
 
 #status {
     margin-top: 20px;
-    color: #00ff88;
+    color: #0024F1; /* Blue accent */
 }
 
 .about {
-    background: rgba(255, 255, 255, 0.1);
+    background: #ffffff; /* White background for about */
     padding: 40px;
     border-radius: 10px;
     text-align: center;
     max-width: 600px;
     width: 100%;
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+    box-shadow: 0 0 20px rgba(0, 36, 241, 0.1); /* Blue shadow */
 }
 
 .about h1 {
     font-family: 'Montserrat', sans-serif; /* Heading font */
     font-size: 2.5rem;
-    color: #00ff88;
+    color: #0024F1; /* Blue accent */
     margin-bottom: 20px;
     font-weight: 700;
 }
@@ -176,18 +176,18 @@ form button:hover {
 }
 
 .about a {
-    color: #00ff88;
+    color: #0024F1; /* Blue accent */
     text-decoration: none;
 }
 
 .about a:hover {
-    color: #00ccff;
+    color: #0018b8; /* Darker blue for hover */
 }
 
 footer {
     text-align: center;
     padding: 20px;
-    background: #0f0f1f;
+    background: #ffffff; /* White footer */
 }
 
 .social-links {
@@ -201,10 +201,12 @@ footer {
 .social-links img {
     width: 30px;
     transition: transform 0.3s;
+    filter: grayscale(100%); /* Greyed out by default */
 }
 
 .social-links img:hover {
     transform: scale(1.2);
+    filter: none; /* Restore color on hover */
 }
 
 .shardeum-logo {
@@ -220,15 +222,15 @@ input:hover::after,
 select:hover::after {
     content: attr(title);
     position: absolute;
-    background: rgba(15, 15, 31, 0.9);
-    color: #e0e0e0;
+    background: #ffffff; /* White tooltip background */
+    color: #333333;
     padding: 10px 15px;
     border-radius: 5px;
     font-size: 0.9rem;
     white-space: pre-wrap;
     max-width: 300px;
     z-index: 1000;
-    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+    box-shadow: 0 0 10px rgba(0, 36, 241, 0.3); /* Blue shadow */
     top: -100%;
     left: 50%;
     transform: translateX(-50%);
