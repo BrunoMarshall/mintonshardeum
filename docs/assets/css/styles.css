@@ -1,0 +1,167 @@
+/* Futuristic font and clean design */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Orbitron', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    background: #0f0f1f;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.logo img {
+    height: 50px;
+}
+
+nav a {
+    color: #00ff88;
+    text-decoration: none;
+    margin: 0 20px;
+    font-size: 1.2rem;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #00ccff;
+}
+
+#connect-metamask {
+    background: #00ff88;
+    color: #0f0f1f;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s;
+}
+
+#connect-metamask:hover {
+    background: #00ccff;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px;
+}
+
+.minter, .about {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+}
+
+.minter h1, .about h1 {
+    font-size: 2.5rem;
+    color: #00ff88;
+    margin-bottom: 20px;
+}
+
+.minter p, .about p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+form label {
+    font-size: 1.1rem;
+    color: #00ccff;
+}
+
+form input, form select, form button {
+    padding: 10px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    background: #2a2a4e;
+    color: #e0e0e0;
+}
+
+form input[type="checkbox"] {
+    width: auto;
+}
+
+form button {
+    background: #00ff88;
+    color: #0f0f1f;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+form button:hover {
+    background: #00ccff;
+}
+
+#status {
+    margin-top: 20px;
+    color: #00ff88;
+}
+
+.about ul {
+    text-align: left;
+    margin: 20px 0;
+}
+
+.about a {
+    color: #00ff88;
+    text-decoration: none;
+}
+
+.about a:hover {
+    color: #00ccff;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #0f0f1f;
+}
+
+.social-links {
+    margin-bottom: 20px;
+}
+
+.social-links a {
+    margin: 0 10px;
+}
+
+.social-links img {
+    width: 30px;
+    transition: transform 0.3s;
+}
+
+.social-links img:hover {
+    transform: scale(1.2);
+}
+
+.shardeum-logo {
+    width: 100px;
+}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MintonShardeum - Token Minter</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="icon" href="assets/images/mintonshardeum_favicon.png">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="assets/images/mintonshardeum_logo.png" alt="MintonShardeum Logo">
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <button id="connect-metamask">Connect MetaMask</button>
+        </nav>
+    </header>
+    <main>
+        <section class="minter">
+            <h1>Minton's Token Forge</h1>
+            <p>Create your own tokens on the Shardeum blockchain!</p>
+            <form id="token-form">
+                <label for="token-name">Token Name:</label>
+                <input type="text" id="token-name" required pattern="[A-Za-z0-9\s]+" title="Alphanumeric and spaces only">
+                
+                <label for="token-symbol">Token Symbol:</label>
+                <input type="text" id="token-symbol" required pattern="[A-Za-z0-9]+" title="Alphanumeric only">
+                
+                <label for="initial-supply">Initial Supply:</label>
+                <input type="number" id="initial-supply" required min="1" step="1">
+                
+                <label for="max-supply">Max Supply:</label>
+                <input type="number" id="max-supply" required min="1" step="1">
+                
+                <label for="decimals">Decimals:</label>
+                <input type="number" id="decimals" required min="0" max="18" value="18">
+                
+                <label for="mintable">Mintable:</label>
+                <input type="checkbox" id="mintable">
+                
+                <label for="network">Network:</label>
+                <select id="network" required>
+                    <option value="testnet">Shardeum Testnet</option>
+                    <option value="mainnet">Shardeum Mainnet</option>
+                </select>
+                
+                <button type="submit">Mint Token</button>
+            </form>
+            <p id="status"></p>
+        </section>
+    </main>
+    <footer>
+        <div class="social-links">
+            <a href="https://discord.com/invite/shardeum"><img src="assets/images/discord.svg" alt="Discord"></a>
+            <a href="https://github.com/BrunoMarshall/mintonshardeum"><img src="assets/images/github.svg" alt="GitHub"></a>
+            <a href="https://www.linkedin.com/company/shardeum"><img src="assets/images/linkedin.svg" alt="LinkedIn"></a>
+            <a href="https://t.me/shardeum"><img src="assets/images/telegram.svg" alt="Telegram"></a>
+            <a href="https://twitter.com/shardeum"><img src="assets/images/twitter.svg" alt="Twitter"></a>
+            <a href="https://www.youtube.com/@shardeum"><img src="assets/images/youtube.svg" alt="YouTube"></a>
+        </div>
+        <img src="assets/images/Shardeum_logo_white.png" alt="Shardeum Logo" class="shardeum-logo">
+    </footer>
+    <script src="assets/js/web3.min.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
