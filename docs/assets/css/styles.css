@@ -110,13 +110,21 @@ form {
     gap: 20px;
 }
 
-form label {
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
     font-size: 1.1rem;
     color: #0024F1; /* Blue accent */
     font-weight: 600;
+    text-align: left;
+    min-width: 120px; /* Fixed width for labels to align inputs */
 }
 
-form input, form select, form button {
+.form-group input, .form-group select {
     padding: 10px;
     font-size: 1rem;
     border: none;
@@ -124,23 +132,28 @@ form input, form select, form button {
     background: #e0e0e8; /* Light grey for inputs */
     color: #333333;
     font-weight: 400;
-    width: 100%; /* Ensure inputs take full width */
+    flex: 1; /* Allow inputs to take remaining space */
 }
 
-form input[type="checkbox"] {
+.form-group input[type="checkbox"] {
     width: auto;
+    margin-left: 10px; /* Space after label for checkbox */
 }
 
-form button {
+.form-group button {
     background: #0024F1; /* Blue accent */
     color: #ffffff;
     cursor: pointer;
     transition: background 0.3s;
     font-weight: 600;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
     width: auto; /* Button width adjusts to content */
+    align-self: flex-start; /* Align button to start */
 }
 
-form button:hover {
+.form-group button:hover {
     background: #0018b8; /* Darker blue for hover */
 }
 
@@ -222,5 +235,3 @@ footer {
 .shardeum-logo {
     width: 100px;
 }
-
-/* Tooltip styling (removed hover tooltips since descriptions are now below) */
