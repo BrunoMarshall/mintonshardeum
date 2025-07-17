@@ -159,15 +159,6 @@ form {
     background: #0018b8; /* Darker blue for hover */
 }
 
-.field-description {
-    font-size: 0.63rem; /* 30% reduction from 0.9rem (0.9 * 0.7 = 0.63) */
-    color: #666666; /* Lighter grey for descriptions */
-    text-align: left;
-    margin-top: 5px;
-    line-height: 1.4;
-    width: 100%; /* Ensure description takes full width below */
-}
-
 #status {
     margin-top: 20px;
     color: #0024F1; /* Blue accent */
