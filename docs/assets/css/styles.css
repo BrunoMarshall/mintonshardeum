@@ -1,11 +1,10 @@
-/* Futuristic font and clean design */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+/* Import new fonts */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Montserrat:wght@700&display=swap');
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Orbitron', sans-serif;
 }
 
 body {
@@ -14,6 +13,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    font-family: 'Open Sans', sans-serif; /* Body font */
 }
 
 header {
@@ -34,6 +34,7 @@ nav a {
     text-decoration: none;
     margin: 0 20px;
     font-size: 1.2rem;
+    font-weight: 600;
     transition: color 0.3s;
 }
 
@@ -49,6 +50,7 @@ nav a:hover {
     border-radius: 5px;
     cursor: pointer;
     font-size: 1rem;
+    font-weight: 600;
     transition: background 0.3s;
 }
 
@@ -75,9 +77,11 @@ main {
 }
 
 .minter h1, .about h1 {
+    font-family: 'Montserrat', sans-serif; /* Heading font */
     font-size: 2.5rem;
     color: #00ff88;
     margin-bottom: 20px;
+    font-weight: 700;
 }
 
 .minter p, .about p {
@@ -94,6 +98,7 @@ form {
 form label {
     font-size: 1.1rem;
     color: #00ccff;
+    font-weight: 600;
 }
 
 form input, form select, form button {
@@ -103,6 +108,7 @@ form input, form select, form button {
     border-radius: 5px;
     background: #2a2a4e;
     color: #e0e0e0;
+    font-weight: 400;
 }
 
 form input[type="checkbox"] {
@@ -114,6 +120,7 @@ form button {
     color: #0f0f1f;
     cursor: pointer;
     transition: background 0.3s;
+    font-weight: 600;
 }
 
 form button:hover {
