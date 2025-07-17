@@ -124,6 +124,7 @@ form input, form select, form button {
     background: #e0e0e8; /* Light grey for inputs */
     color: #333333;
     font-weight: 400;
+    width: 100%; /* Ensure inputs take full width */
 }
 
 form input[type="checkbox"] {
@@ -136,10 +137,19 @@ form button {
     cursor: pointer;
     transition: background 0.3s;
     font-weight: 600;
+    width: auto; /* Button width adjusts to content */
 }
 
 form button:hover {
     background: #0018b8; /* Darker blue for hover */
+}
+
+.field-description {
+    font-size: 0.9rem;
+    color: #666666; /* Lighter grey for descriptions */
+    text-align: left;
+    margin-top: 5px;
+    line-height: 1.4;
 }
 
 #status {
@@ -213,40 +223,4 @@ footer {
     width: 100px;
 }
 
-/* Tooltip styling */
-input, select {
-    position: relative;
-}
-
-input:hover::after,
-select:hover::after {
-    content: attr(title);
-    position: absolute;
-    background: #ffffff; /* White tooltip background */
-    color: #333333;
-    padding: 10px 15px;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    white-space: pre-wrap;
-    max-width: 300px;
-    z-index: 1000;
-    box-shadow: 0 0 10px rgba(0, 36, 241, 0.3); /* Blue shadow */
-    top: -100%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0s linear 0.3s;
-}
-
-input:hover::after,
-select:hover::after {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.3s;
-}
-
-/* Ensure checkbox tooltip works */
-input[type="checkbox"]:hover::after {
-    top: -150%;
-}
+/* Tooltip styling (removed hover tooltips since descriptions are now below) */
