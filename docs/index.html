@@ -24,22 +24,22 @@
             <p>Create your own tokens on the Shardeum blockchain!</p>
             <form id="token-form">
                 <label for="token-name">Token Name:</label>
-                <input type="text" id="token-name" required pattern="[A-Za-z0-9\s]+" title="Alphanumeric and spaces only">
+                <input type="text" id="token-name" required pattern="[A-Za-z0-9\s]+" title="The full, human-readable name of your token. This is how your token will be identified in wallets and exchanges. Example: Shardeum Token">
                 
                 <label for="token-symbol">Token Symbol:</label>
-                <input type="text" id="token-symbol" required pattern="[A-Za-z0-9]+" title="Alphanumeric only">
+                <input type="text" id="token-symbol" required pattern="[A-Za-z0-9]+" title="The abbreviated ticker symbol representing your token, typically 3-5 letters. This is the shorthand displayed next to balances. Example: SHD. Keep it concise and memorable — long or complex symbols can look awkward. Use uppercase letters by convention (e.g., SHD instead of shd) for better readability. Check if your symbol is already used on popular tokens to avoid confusion.">
                 
                 <label for="initial-supply">Initial Supply:</label>
-                <input type="number" id="initial-supply" required min="1" step="1">
+                <input type="number" id="initial-supply" required min="1" step="1" title="The number of tokens that are created (minted) right when the token contract is deployed. This is how many tokens exist initially. Example: If you set the initial supply to 1,000,000 tokens, then at deployment, exactly 1 million tokens will be minted and assigned to the owner’s address or another specified address. Note: If your token is mintable, the initial supply is just the starting amount — you can increase total tokens later by minting. Important: Usually specified in the smallest divisible units (called 'token units' or 'base units'). For example, if decimals are 18, to mint 1 million tokens you enter 1000000 * 10^18 (1,000,000 followed by 18 zeros). Example: 1000000000000000000000000 (which equals 1,000,000 tokens with 18 decimals)">
                 
                 <label for="max-supply">Max Supply:</label>
-                <input type="number" id="max-supply" required min="1" step="1">
+                <input type="number" id="max-supply" required min="1" step="1" title="The maximum number of tokens that can ever exist. Even if minting is enabled, tokens cannot be minted beyond this cap.">
                 
                 <label for="decimals">Decimals:</label>
-                <input type="number" id="decimals" required min="0" max="18" value="18">
+                <input type="number" id="decimals" required min="0" max="18" value="18" title="How many decimal places your token supports. This determines how divisible the token is. The standard is 18 decimals, like Ether, meaning you can divide tokens down to 0.000000000000000001 units. Example: 18">
                 
                 <label for="mintable">Mintable:</label>
-                <input type="checkbox" id="mintable">
+                <input type="checkbox" id="mintable" title="Indicates whether new tokens can be created (minted) after the initial deployment. - Yes: The Owner Address / Admin can create more tokens later. (The wallet address that controls the token contract. The owner here have special privileges, such as minting. This can be your personal wallet or a multisig for better security.) - No: Token supply is fixed at initial supply; no one can mint further tokens. (The Initial Distribution goes to the owner address.)">
                 
                 <label for="network">Network:</label>
                 <select id="network" required>
