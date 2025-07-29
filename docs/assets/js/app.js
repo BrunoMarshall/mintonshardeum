@@ -42,7 +42,7 @@ const factoryABI = [
 ];
 
 // Factory address (updated to the new deployment)
-const factoryAddress = "0x92d823addd7d3a1a0f4f64f13b2e092203f71240"; // New deployed factory address
+const factoryAddress = "0xece2e1691f4bcaeeece3ae0f284d1563e41048cb"; // New deployed factory address
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 
 // DOM elements
@@ -94,7 +94,7 @@ tokenForm.addEventListener("submit", async (e) => {
     const tx = await factory.methods.deployToken(tokenName, tokenSymbol, initialSupply, maxSupply, mintable).send({
       from: accounts[0],
       value: deploymentFee,
-      gas: 3000000, // Explicit gas limit
+      gas: 4000000, // Increased gas limit to accommodate the new logic
       gasPrice: gasPrice // Use legacy gas price to avoid EIP-1559
     });
     status.textContent = `New token deployed! Name: ${tokenName}, Symbol: ${tokenSymbol}, Address: ${tx.events.TokenDeployed.returnValues.tokenAddress}`;
