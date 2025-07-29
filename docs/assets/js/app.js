@@ -53,12 +53,19 @@ const status = document.getElementById("status");
 // Connect to MetaMask
 connectButton.addEventListener("click", async () => {
   try {
+    // Request account access
     await window.ethereum.request({ method: "eth_requestAccounts" });
     const accounts = await web3.eth.getAccounts();
-    status.textContent = `Connected: ${accounts[0]}`;
-    connectButton.disabled = true;
+    if (accounts.length > 0) {
+      status.textContent = `Connected: ${accounts[0]}`;
+      connectButton.textContent = "Connected";
+      connectButton.disabled = true;
+    } else {
+      status.textContent = "No accounts found. Please unlock MetaMask.";
+    }
   } catch (error) {
-    status.textContent = `Connection failed: ${error.message}`;
+    status.textContent = `Connection failed: ${error.message}. Ensure MetaMask is installed and on Shardeum Unstablenet.`;
+    console.error("MetaMask Error:", error);
   }
 });
 
@@ -84,11 +91,13 @@ tokenForm.addEventListener("submit", async (e) => {
     const deploymentFee = web3.utils.toWei("10", "ether"); // 10 SHM
     const tx = await factory.methods.deployToken(tokenName, tokenSymbol, initialSupply, maxSupply, mintable).send({
       from: accounts[0],
-      value: deploymentFee
+      value: deploymentFee,
+      gas: 3000000 // Explicit gas limit to avoid EIP-1559 issues
     });
     status.textContent = `New token deployed! Name: ${tokenName}, Symbol: ${tokenSymbol}, Address: ${tx.events.TokenDeployed.returnValues.tokenAddress}`;
   } catch (error) {
     status.textContent = `Deployment failed: ${error.message}`;
+    console.error("Deployment Error:", error);
   }
 });
 
@@ -98,6 +107,10 @@ window.addEventListener("load", async () => {
     const chainId = await web3.eth.getChainId();
     if (chainId !== 8080) {
       status.textContent = "Please switch to Shardeum Unstablenet (Chain ID: 8080) in MetaMask!";
+    } else {
+      status.textContent = "Ready. Connect MetaMask to proceed.";
     }
+  } else {
+    status.textContent = "MetaMask not detected. Please install it.";
   }
 });
