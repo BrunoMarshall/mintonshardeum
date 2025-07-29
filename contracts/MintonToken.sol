@@ -5,12 +5,13 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MintonToken is ERC20, Ownable {
-    uint256 public constant MINT_FEE = 10 * 10**18;
+    uint256 public constant MINT_FEE = 10 * 10**18; // 10 SHM
     address public feeCollector;
     uint256 public maxSupply;
     bool public mintable;
 
     event FeeCollectorSet(address indexed feeCollector);
+    event MintWithFee(address indexed to, uint256 userAmount, uint256 feeAmount);
 
     constructor(
         string memory name,
@@ -24,9 +25,9 @@ contract MintonToken is ERC20, Ownable {
         require(_feeCollector != address(0), "Fee collector cannot be zero address");
         maxSupply = _maxSupply;
         mintable = _mintable;
-        feeCollector = _feeCollector;
-        emit FeeCollectorSet(_feeCollector); // Debug event
-        _mint(initialOwner, initialSupply);
+        feeCollector = _feeCollector; // Explicitly set from parameter
+        emit FeeCollectorSet(_feeCollector); // Log for debugging
+        _mint(initialOwner, initialSupply); // Mint initial supply to owner
     }
 
     function mint(address to, uint256 amount) public payable {
@@ -37,23 +38,20 @@ contract MintonToken is ERC20, Ownable {
         require(feeCollector != address(0), "Fee collector not set");
 
         uint256 feeAmount = (amount * 1) / 1000; // 0.1% fee
+        require(feeAmount > 0, "Amount too small for fee"); // Prevent zero fee
         uint256 userAmount = amount - feeAmount;
 
         // Transfer 10 SHM to feeCollector
         (bool sent, ) = payable(feeCollector).call{value: MINT_FEE}("");
-        require(sent, "Failed to send SHM fee to feeCollector");
+        require(sent, "Failed to send SHM fee");
 
-        // Mint tokens: 0.1% to feeCollector, rest to recipient
-        if (feeAmount > 0) {
-            // Ensure feeCollector can receive tokens
-            (bool success, ) = feeCollector.staticcall(abi.encodeWithSignature("balanceOf(address)", feeCollector));
-            require(success, "Fee collector cannot receive tokens");
-            _mint(feeCollector, feeAmount);
-        }
-        if (userAmount > 0) _mint(to, userAmount);
+        // Mint tokens: fee to feeCollector, rest to recipient
+        _mint(feeCollector, feeAmount); // Always mint fee first
+        _mint(to, userAmount); // Then mint to recipient
 
+        emit MintWithFee(to, userAmount, feeAmount); // Custom event for tracking
         emit Transfer(address(0), to, userAmount);
-        if (feeAmount > 0) emit Transfer(address(0), feeCollector, feeAmount);
+        emit Transfer(address(0), feeCollector, feeAmount);
     }
 
     function setMintable(bool _mintable) public onlyOwner {
