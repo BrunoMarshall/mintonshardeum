@@ -1,119 +1,103 @@
-// Web3.js integration for MetaMask and Shardeum
-const Web3 = window.Web3;
-let web3;
-let contract;
-const contractAddress = "YOUR_CONTRACT_ADDRESS"; // Replace with deployed contract address
-const contractABI = [
-    // Paste the ABI from Remix after deploying the contract
-    // Example ABI structure (simplified):
-    [
-        {
-            "inputs": [
-                {"internalType": "string", "name": "name", "type": "string"},
-                {"internalType": "string", "name": "symbol", "type": "string"},
-                {"internalType": "uint256", "name": "initialSupply", "type": "uint256"},
-                {"internalType": "uint256", "name": "_maxSupply", "type": "uint256"},
-                {"internalType": "bool", "name": "_mintable", "type": "bool"}
-            ],
-            "stateMutability": "nonpayable",
-            "type": "constructor"
-        },
-        // Add the rest of the ABI here
-    ]
+// docs/assets/js/app.js
+
+const web3 = new Web3(window.ethereum);
+
+// Factory ABI
+const factoryABI = [
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {"internalType": "string", "name": "name", "type": "string"},
+      {"internalType": "string", "name": "symbol", "type": "string"},
+      {"internalType": "uint256", "name": "initialSupply", "type": "uint256"},
+      {"internalType": "uint256", "name": "maxSupply", "type": "uint256"},
+      {"internalType": "bool", "name": "mintable", "type": "bool"}
+    ],
+    "name": "deployToken",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getDeployedTokens",
+    "outputs": [{"internalType": "address[]", "name": "", "type": "address[]"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": false, "internalType": "address", "name": "tokenAddress", "type": "address"},
+      {"indexed": false, "internalType": "string", "name": "name", "type": "string"},
+      {"indexed": false, "internalType": "string", "name": "symbol", "type": "string"}
+    ],
+    "name": "TokenDeployed",
+    "type": "event"
+  }
 ];
 
-const testnetConfig = {
-    networkName: "Shardeum Testnet",
-    rpcUrl: "https://api-testnet.shardeum.org",
-    chainId: "8083",
-    explorerUrl: "https://explorer-testnet.shardeum.org"
-};
+// Factory address
+const factoryAddress = "0x1eadb39906cec62a5b0d4913e8b72594a3cd3499"; // Your deployed factory address
+const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 
-const mainnetConfig = {
-    networkName: "Shardeum",
-    rpcUrl: "https://api.shardeum.org",
-    chainId: "8118",
-    explorerUrl: "https://explorer.shardeum.org"
-};
+// DOM elements
+const connectButton = document.getElementById("connect-metamask");
+const tokenForm = document.getElementById("token-form");
+const status = document.getElementById("status");
 
-async function connectMetaMask() {
-    if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        try {
-            await window.ethereum.request({ method: "eth_requestAccounts" });
-            const accounts = await web3.eth.getAccounts();
-            document.getElementById("connect-metamask").innerText = `Connected: ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
-            return accounts[0];
-        } catch (error) {
-            console.error("MetaMask connection failed:", error);
-            document.getElementById("status").innerText = "Failed to connect MetaMask";
-        }
-    } else {
-        document.getElementById("status").innerText = "Please install MetaMask";
+// Connect to MetaMask
+connectButton.addEventListener("click", async () => {
+  try {
+    await window.ethereum.request({ method: "eth_requestAccounts" });
+    const accounts = await web3.eth.getAccounts();
+    status.textContent = `Connected: ${accounts[0]}`;
+    connectButton.disabled = true;
+  } catch (error) {
+    status.textContent = `Connection failed: ${error.message}`;
+  }
+});
+
+// Handle form submission to deploy new token
+tokenForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const accounts = await web3.eth.getAccounts();
+  if (!accounts || accounts.length === 0) {
+    status.textContent = "Please connect MetaMask first!";
+    return;
+  }
+
+  const tokenName = document.getElementById("token-name").value;
+  const tokenSymbol = document.getElementById("token-symbol").value;
+  const initialSupply = web3.utils.toWei(document.getElementById("initial-supply").value, "ether");
+  const maxSupply = web3.utils.toWei(document.getElementById("max-supply").value, "ether");
+  const decimals = parseInt(document.getElementById("decimals").value);
+  const mintable = document.getElementById("mintable").checked;
+  const network = document.getElementById("network").value;
+
+  try {
+    const deploymentFee = web3.utils.toWei("10", "ether"); // 10 SHM
+    const tx = await factory.methods.deployToken(tokenName, tokenSymbol, initialSupply, maxSupply, mintable).send({
+      from: accounts[0],
+      value: deploymentFee
+    });
+    status.textContent = `New token deployed! Name: ${tokenName}, Symbol: ${tokenSymbol}, Address: ${tx.events.TokenDeployed.returnValues.tokenAddress}`;
+  } catch (error) {
+    status.textContent = `Deployment failed: ${error.message}`;
+  }
+});
+
+// Check network on load
+window.addEventListener("load", async () => {
+  if (window.ethereum) {
+    const chainId = await web3.eth.getChainId();
+    if (chainId !== 8080) {
+      status.textContent = "Please switch to Shardeum Unstablenet (Chain ID: 8080) in MetaMask!";
     }
-}
-
-async function switchNetwork(network) {
-    const config = network === "testnet" ? testnetConfig : mainnetConfig;
-    try {
-        await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: `0x${parseInt(config.chainId).toString(16)}` }],
-        });
-    } catch (switchError) {
-        if (switchError.code === 4902) {
-            await window.ethereum.request({
-                method: "wallet_addEthereumChain",
-                params: [{
-                    chainId: `0x${parseInt(config.chainId).toString(16)}`,
-                    chainName: config.networkName,
-                    rpcUrls: [config.rpcUrl],
-                    blockExplorerUrls: [config.explorerUrl],
-                    nativeCurrency: { name: "SHM", symbol: "SHM", decimals: 18 }
-                }],
-            });
-        } else {
-            throw switchError;
-        }
-    }
-}
-
-document.getElementById("connect-metamask").addEventListener("click", connectMetaMask);
-
-document.getElementById("token-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const status = document.getElementById("status");
-    status.innerText = "Processing...";
-
-    const tokenName = document.getElementById("token-name").value;
-    const tokenSymbol = document.getElementById("token-symbol").value;
-    const initialSupply = document.getElementById("initial-supply").value;
-    const maxSupply = document.getElementById("max-supply").value;
-    const decimals = document.getElementById("decimals").value;
-    const mintable = document.getElementById("mintable").checked;
-    const network = document.getElementById("network").value;
-
-    // Input validation to prevent injection
-    if (!/^[A-Za-z0-9\s]+$/.test(tokenName) || !/^[A-Za-z0-9]+$/.test(tokenSymbol)) {
-        status.innerText = "Invalid input: Use alphanumeric characters only";
-        return;
-    }
-
-    try {
-        await switchNetwork(network);
-        const accounts = await web3.eth.getAccounts();
-        contract = new web3.eth.Contract(contractABI, contractAddress);
-
-        const initialSupplyWei = web3.utils.toWei(initialSupply, "ether");
-        const maxSupplyWei = web3.utils.toWei(maxSupply, "ether");
-
-        await contract.methods
-            .mint(accounts[0], initialSupplyWei)
-            .send({ from: accounts[0], value: web3.utils.toWei("10", "ether") });
-
-        status.innerText = `Token ${tokenName} (${tokenSymbol}) minted successfully!`;
-    } catch (error) {
-        console.error("Minting failed:", error);
-        status.innerText = "Minting failed: " + error.message;
-    }
+  }
 });
