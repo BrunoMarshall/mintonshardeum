@@ -5,17 +5,13 @@ const web3 = new Web3(window.ethereum);
 // Factory ABI
 const factoryABI = [
   {
-    "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
     "inputs": [
       {"internalType": "string", "name": "name", "type": "string"},
       {"internalType": "string", "name": "symbol", "type": "string"},
       {"internalType": "uint256", "name": "initialSupply", "type": "uint256"},
       {"internalType": "uint256", "name": "maxSupply", "type": "uint256"},
-      {"internalType": "bool", "name": "mintable", "type": "bool"}
+      {"internalType": "bool", "name": "mintable", "type": "bool"},
+      {"internalType": "address", "name": "feeCollectorOverride", "type": "address"}
     ],
     "name": "deployToken",
     "outputs": [],
@@ -38,11 +34,16 @@ const factoryABI = [
     ],
     "name": "TokenDeployed",
     "type": "event"
+  },
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
   }
 ];
 
 // Factory address (updated to the new deployment)
-const factoryAddress = "0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4"; // New deployed factory address
+const factoryAddress = "0xe0ffe47718860b232e1c1750dababf3f211f230c"; // New deployed factory address
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 
 // DOM elements
@@ -86,15 +87,15 @@ tokenForm.addEventListener("submit", async (e) => {
   const maxSupply = web3.utils.toWei(document.getElementById("max-supply").value, "ether");
   const decimals = parseInt(document.getElementById("decimals").value);
   const mintable = document.getElementById("mintable").checked;
-  const network = document.getElementById("network").value;
+  const feeCollectorOverride = "0x0eE1b98198E400d8Da9E5431F477C0A1A2269505"; // Explicit feeCollector
 
   try {
     const deploymentFee = web3.utils.toWei("10", "ether"); // 10 SHM
     const gasPrice = await web3.eth.getGasPrice(); // Fetch current gas price
-    const tx = await factory.methods.deployToken(tokenName, tokenSymbol, initialSupply, maxSupply, mintable).send({
+    const tx = await factory.methods.deployToken(tokenName, tokenSymbol, initialSupply, maxSupply, mintable, feeCollectorOverride).send({
       from: accounts[0],
       value: deploymentFee,
-      gas: 4000000, // Increased gas limit to accommodate the new logic
+      gas: 4000000, // Increased gas limit
       gasPrice: gasPrice // Use legacy gas price to avoid EIP-1559
     });
     status.textContent = `New token deployed! Name: ${tokenName}, Symbol: ${tokenSymbol}, Address: ${tx.events.TokenDeployed.returnValues.tokenAddress}`;
