@@ -42,7 +42,7 @@ const factoryABI = [
 ];
 
 // Factory address (updated to the new deployment)
-const factoryAddress = "0xbd6c4157e9352fe3241f4a6192b6ce3a588318b2"; // New deployed factory address
+const factoryAddress = "0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4"; // New deployed factory address
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 
 // DOM elements
