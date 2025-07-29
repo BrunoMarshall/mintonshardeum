@@ -43,7 +43,7 @@ const factoryABI = [
 ];
 
 // Factory address (updated to the new deployment)
-const factoryAddress = "0xe0ffe47718860b232e1c1750dababf3f211f230c"; // New deployed factory address
+const factoryAddress = "0xc23ae3a1e9bfa54e43e18487f4c68cc7916987d1"; // New deployed factory address
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 
 // DOM elements
@@ -54,7 +54,6 @@ const status = document.getElementById("status");
 // Connect to MetaMask
 connectButton.addEventListener("click", async () => {
   try {
-    // Request account access
     await window.ethereum.request({ method: "eth_requestAccounts" });
     const accounts = await web3.eth.getAccounts();
     if (accounts.length > 0) {
@@ -66,7 +65,7 @@ connectButton.addEventListener("click", async () => {
       status.textContent = "No accounts found. Please unlock MetaMask.";
     }
   } catch (error) {
-    status.textContent = `Connection failed: ${error.message}. Ensure MetaMask is installed and on Shardeum Unstablenet.`;
+    status.textContent = `Connection failed: ${error.message}. Ensure MetaMask is on Shardeum Unstablenet.`;
     console.error("MetaMask Error:", error);
   }
 });
@@ -91,12 +90,12 @@ tokenForm.addEventListener("submit", async (e) => {
 
   try {
     const deploymentFee = web3.utils.toWei("10", "ether"); // 10 SHM
-    const gasPrice = await web3.eth.getGasPrice(); // Fetch current gas price
+    const gasPrice = await web3.eth.getGasPrice();
     const tx = await factory.methods.deployToken(tokenName, tokenSymbol, initialSupply, maxSupply, mintable, feeCollectorOverride).send({
       from: accounts[0],
       value: deploymentFee,
-      gas: 4000000, // Increased gas limit
-      gasPrice: gasPrice // Use legacy gas price to avoid EIP-1559
+      gas: 4000000,
+      gasPrice: gasPrice
     });
     status.textContent = `New token deployed! Name: ${tokenName}, Symbol: ${tokenSymbol}, Address: ${tx.events.TokenDeployed.returnValues.tokenAddress}`;
   } catch (error) {
