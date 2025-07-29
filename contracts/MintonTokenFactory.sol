@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MintonTokenFactory is Ownable {
     address[] public deployedTokens;
-    uint256 public deploymentFee = 10 * 10**18; // 10 SHM
+    uint256 public deploymentFee = 10 * 10**18;
 
     event TokenDeployed(address tokenAddress, string name, string symbol);
 
@@ -19,7 +19,7 @@ contract MintonTokenFactory is Ownable {
         uint256 maxSupply,
         bool mintable,
         address feeCollectorOverride
-    ) external payable {
+    ) public payable {
         require(msg.value >= deploymentFee, "Insufficient deployment fee");
         require(feeCollectorOverride != address(0), "Fee collector cannot be zero address");
 
@@ -36,15 +36,10 @@ contract MintonTokenFactory is Ownable {
         deployedTokens.push(address(newToken));
         emit TokenDeployed(address(newToken), name, symbol);
 
-        // Transfer fee to factory owner
         payable(owner()).transfer(msg.value);
     }
 
-    function getDeployedTokens() external view returns (address[] memory) {
+    function getDeployedTokens() public view returns (address[] memory) {
         return deployedTokens;
-    }
-
-    function setDeploymentFee(uint256 newFee) external onlyOwner {
-        deploymentFee = newFee;
     }
 }
