@@ -57,7 +57,8 @@ connectButton.addEventListener("click", async () => {
     await window.ethereum.request({ method: "eth_requestAccounts" });
     const accounts = await web3.eth.getAccounts();
     if (accounts.length > 0) {
-      status.textContent = `Connected: ${accounts[0]}`;
+      const account = accounts[0];
+      status.textContent = `Connected: ${account}`;
       connectButton.textContent = "Connected";
       connectButton.disabled = true;
     } else {
@@ -89,10 +90,12 @@ tokenForm.addEventListener("submit", async (e) => {
 
   try {
     const deploymentFee = web3.utils.toWei("10", "ether"); // 10 SHM
+    const gasPrice = await web3.eth.getGasPrice(); // Fetch current gas price
     const tx = await factory.methods.deployToken(tokenName, tokenSymbol, initialSupply, maxSupply, mintable).send({
       from: accounts[0],
       value: deploymentFee,
-      gas: 3000000 // Explicit gas limit to avoid EIP-1559 issues
+      gas: 3000000, // Explicit gas limit
+      gasPrice: gasPrice // Use legacy gas price to avoid EIP-1559
     });
     status.textContent = `New token deployed! Name: ${tokenName}, Symbol: ${tokenSymbol}, Address: ${tx.events.TokenDeployed.returnValues.tokenAddress}`;
   } catch (error) {
