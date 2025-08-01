@@ -6,6 +6,40 @@
     <title>MintonShardeum - Token Minter</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="icon" href="assets/images/mintonshardeum_favicon.png">
+    <style>
+        .wallet-buttons {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .wallet-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #connect-metamask {
+            background-color: #4caf50;
+            color: white;
+        }
+        #connect-metamask:hover {
+            background-color: #45a049;
+        }
+        #disconnect-metamask {
+            background-color: #f44336;
+            color: white;
+            display: none;
+        }
+        #disconnect-metamask:hover {
+            background-color: #da190b;
+        }
+        #wallet-address {
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -13,7 +47,11 @@
         <nav>
             <a href="index.html">Home</a>
             <a href="about.html">About</a>
-            <button id="connect-metamask">Connect MetaMask</button>
+            <div class="wallet-buttons">
+                <button id="connect-metamask" class="wallet-button">Connect MetaMask</button>
+                <button id="disconnect-metamask" class="wallet-button">Disconnect</button>
+                <span id="wallet-address"></span>
+            </div>
         </nav>
     </header>
     <main>

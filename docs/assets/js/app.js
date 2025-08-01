@@ -1,11 +1,11 @@
 // assets/js/app.js
 
-// Debugging: Log when script starts
+// Debugging: Log script loading
 console.log("app.js loaded");
 
 const Web3 = require('web3');
 
-// Check if window.ethereum is available before initializing
+// Check for MetaMask
 if (!window.ethereum) {
     console.error("MetaMask not detected. Please install MetaMask.");
     document.getElementById("status").textContent = "MetaMask not detected. Please install it.";
@@ -67,11 +67,15 @@ const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 
 // DOM elements
 const connectButton = document.getElementById("connect-metamask");
+const disconnectButton = document.getElementById("disconnect-metamask");
+const walletAddressDisplay = document.getElementById("wallet-address");
 const tokenForm = document.getElementById("token-form");
 const status = document.getElementById("status");
 
 // Debugging: Verify DOM elements
 if (!connectButton) console.error("Connect button not found");
+if (!disconnectButton) console.error("Disconnect button not found");
+if (!walletAddressDisplay) console.error("Wallet address display not found");
 if (!tokenForm) console.error("Token form not found");
 if (!status) console.error("Status element not found");
 
@@ -87,9 +91,12 @@ connectButton.addEventListener("click", async () => {
         console.log("Accounts retrieved:", accounts);
         if (accounts.length > 0) {
             const account = accounts[0];
-            status.textContent = `Connected: ${account}`;
-            connectButton.textContent = "Connected";
-            connectButton.disabled = true;
+            // Truncate address for display (first 6 and last 4 characters)
+            const truncatedAddress = `${account.slice(0, 6)}…${account.slice(-4)}`;
+            walletAddressDisplay.textContent = `Connected: ${truncatedAddress}`;
+            connectButton.style.display = "none";
+            disconnectButton.style.display = "inline-block";
+            status.textContent = "Ready to deploy tokens.";
         } else {
             status.textContent = "No accounts found. Please unlock MetaMask.";
             console.warn("No accounts returned from MetaMask");
@@ -97,6 +104,21 @@ connectButton.addEventListener("click", async () => {
     } catch (error) {
         status.textContent = `Connection failed: ${error.message}. Ensure MetaMask is on Shardeum Unstablenet.`;
         console.error("MetaMask Connection Error:", error);
+    }
+});
+
+// Disconnect MetaMask
+disconnectButton.addEventListener("click", async () => {
+    console.log("Disconnect MetaMask button clicked");
+    try {
+        // Clear wallet display and reset UI
+        walletAddressDisplay.textContent = "";
+        connectButton.style.display = "inline-block";
+        disconnectButton.style.display = "none";
+        status.textContent = "Disconnected. Connect MetaMask to proceed.";
+    } catch (error) {
+        status.textContent = `Disconnection failed: ${error.message}`;
+        console.error("Disconnect Error:", error);
     }
 });
 
