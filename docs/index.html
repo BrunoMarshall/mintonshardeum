@@ -1,45 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MintonShardeum - Token Minter</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="icon" href="assets/images/mintonshardeum_favicon.png">
-    <style>
-        .wallet-buttons {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .wallet-button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        #connect-metamask {
-            background-color: #4caf50;
-            color: white;
-        }
-        #connect-metamask:hover {
-            background-color: #45a049;
-        }
-        #disconnect-metamask {
-            background-color: #f44336;
-            color: white;
-            display: none;
-        }
-        #disconnect-metamask:hover {
-            background-color: #da190b;
-        }
-        #wallet-address {
-            font-size: 14px;
-            color: #333;
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -47,11 +12,7 @@
         <nav>
             <a href="index.html">Home</a>
             <a href="about.html">About</a>
-            <div class="wallet-buttons">
-                <button id="connect-metamask" class="wallet-button">Connect MetaMask</button>
-                <button id="disconnect-metamask" class="wallet-button">Disconnect</button>
-                <span id="wallet-address"></span>
-            </div>
+            <button id="connect-metamask">Connect MetaMask</button>
         </nav>
     </header>
     <main>
@@ -66,50 +27,57 @@
                     <label for="token-name">Token Name:</label>
                     <input type="text" id="token-name" required pattern="[A-Za-z0-9\s]+">
                 </div>
-                <div class="form-group">
-                    <label for="token-symbol">Token Symbol:</label>
-                    <input type="text" id="token-symbol" required pattern="[A-Za-z0-9]+" maxlength="5">
-                </div>
-                <div class="form-group">
-                    <label for="initial-supply">Initial Supply:</label>
-                    <input type="number" id="initial-supply" required min="1" step="1">
-                </div>
-                <div class="form-group">
-                    <label for="max-supply">Max Supply:</label>
-                    <input type="number" id="max-supply" required min="1" step="1">
-                </div>
-                <div class="form-group">
-                    <label for="decimals">Decimals:</label>
-                    <input type="number" id="decimals" required min="0" max="18" value="18">
-                </div>
-                <div class="form-group">
-                    <label for="mintable">Mintable:</label>
-                    <input type="checkbox" id="mintable">
-                </div>
-                <div class="form-group">
-                    <label for="network">Network:</label>
-                    <select id="network" required>
-                        <option value="testnet">Shardeum Testnet</option>
-                        <option value="mainnet">Shardeum Mainnet</option>
-                    </select>
-                </div>
-                <button type="submit">Mint Token</button>
-            </form>
-            <p id="status"></p>
-        </section>
-    </main>
-    <footer>
-        <div class="social-links">
-            <a href="https://discord.com/invite/shardeum"><img src="assets/images/discord.svg" alt="Discord"></a>
-            <a href="https://github.com/BrunoMarshall/mintonshardeum"><img src="assets/images/github.svg" alt="GitHub"></a>
-            <a href="https://www.linkedin.com/company/shardeum"><img src="assets/images/linkedin.svg" alt="LinkedIn"></a>
-            <a href="https://t.me/shardeum"><img src="assets/images/telegram.svg" alt="Telegram"></a>
-            <a href="https://twitter.com/shardeum"><img src="assets/images/twitter.svg" alt="Twitter"></a>
-            <a href="https://www.youtube.com/@shardeum"><img src="assets/images/youtube.svg" alt="YouTube"></a>
-        </div>
-        <img src="assets/images/Shardeum_logo_white.png" alt="Shardeum Logo" class="shardeum-logo">
-    </footer>
-    <script src="assets/js/web3.min.js"></script>
-    <script src="assets/js/app.js"></script>
-</body>
+                
+            <div class="form-group">
+                <label for="token-symbol">Token Symbol:</label>
+                <input type="text" id="token-symbol" required pattern="[A-Za-z0-9]+" maxlength="5">
+            </div>
+            
+            <div class="form-group">
+                <label for="initial-supply">Initial Supply:</label>
+                <input type="number" id="initial-supply" required min="1" step="1">
+            </div>
+            
+            <div class="form-group">
+                <label for="max-supply">Max Supply:</label>
+                <input type="number" id="max-supply" required min="1" step="1">
+            </div>
+            
+            <div class="form-group">
+                <label for="decimals">Decimals:</label>
+                <input type="number" id="decimals" required min="0" max="18" value="18">
+            </div>
+            
+            <div class="form-group">
+                <label for="mintable">Mintable:</label>
+                <input type="checkbox" id="mintable">
+            </div>
+            
+            <div class="form-group">
+                <label for="network">Network:</label>
+                <select id="network" required>
+                    <option value="testnet">Shardeum Testnet</option>
+                    <option value="mainnet">Shardeum Mainnet</option>
+                </select>
+            </div>
+            
+            <button type="submit">Mint Token</button>
+        </form>
+        <p id="status"></p>
+    </section>
+</main>
+<footer>
+    <div class="social-links">
+        <a href="https://discord.com/invite/shardeum"><img src="assets/images/discord.svg" alt="Discord"></a>
+        <a href="https://github.com/BrunoMarshall/mintonshardeum"><img src="assets/images/github.svg" alt="GitHub"></a>
+        <a href="https://www.linkedin.com/company/shardeum"><img src="assets/images/linkedin.svg" alt="LinkedIn"></a>
+        <a href="https://t.me/shardeum"><img src="assets/images/telegram.svg" alt="Telegram"></a>
+        <a href="https://twitter.com/shardeum"><img src="assets/images/twitter.svg" alt="Twitter"></a>
+        <a href="https://www.youtube.com/@shardeum"><img src="assets/images/youtube.svg" alt="YouTube"></a>
+    </div>
+    <img src="assets/images/Shardeum_logo_white.png" alt="Shardeum Logo" class="shardeum-logo">
+</footer>
+<script src="assets/js/web3.min.js"></script>
+<script src="assets/js/app.js"></script></body>
 </html>
+
