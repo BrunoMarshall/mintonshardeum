@@ -1,7 +1,18 @@
 // assets/js/app.js
 
+// Debugging: Log when script starts
+console.log("app.js loaded");
+
 const Web3 = require('web3');
-const web3 = new Web3(window.ethereum); // Original initialization
+
+// Check if window.ethereum is available before initializing
+if (!window.ethereum) {
+    console.error("MetaMask not detected. Please install MetaMask.");
+    document.getElementById("status").textContent = "MetaMask not detected. Please install it.";
+}
+
+// Initialize Web3
+const web3 = new Web3(window.ethereum);
 
 // Factory ABI
 const factoryABI = [
@@ -51,7 +62,7 @@ const factoryABI = [
 ];
 
 // Factory address
-const factoryAddress = "0x3be7b13b8fda2cfae58a1c13c0021ad075ca0666"; // From transaction
+const factoryAddress = "0x3be7b13b8fda2cfae58a1c13c0021ad075ca0666";
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 
 // DOM elements
@@ -59,11 +70,21 @@ const connectButton = document.getElementById("connect-metamask");
 const tokenForm = document.getElementById("token-form");
 const status = document.getElementById("status");
 
+// Debugging: Verify DOM elements
+if (!connectButton) console.error("Connect button not found");
+if (!tokenForm) console.error("Token form not found");
+if (!status) console.error("Status element not found");
+
 // Connect to MetaMask
 connectButton.addEventListener("click", async () => {
+    console.log("Connect MetaMask button clicked");
     try {
+        if (!window.ethereum) {
+            throw new Error("MetaMask is not installed");
+        }
         await window.ethereum.request({ method: "eth_requestAccounts" });
         const accounts = await web3.eth.getAccounts();
+        console.log("Accounts retrieved:", accounts);
         if (accounts.length > 0) {
             const account = accounts[0];
             status.textContent = `Connected: ${account}`;
@@ -71,20 +92,23 @@ connectButton.addEventListener("click", async () => {
             connectButton.disabled = true;
         } else {
             status.textContent = "No accounts found. Please unlock MetaMask.";
+            console.warn("No accounts returned from MetaMask");
         }
     } catch (error) {
         status.textContent = `Connection failed: ${error.message}. Ensure MetaMask is on Shardeum Unstablenet.`;
-        console.error("MetaMask Error:", error);
+        console.error("MetaMask Connection Error:", error);
     }
 });
 
 // Handle form submission to deploy new token
 tokenForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    console.log("Token form submitted");
 
     const accounts = await web3.eth.getAccounts();
     if (!accounts || accounts.length === 0) {
         status.textContent = "Please connect MetaMask first!";
+        console.warn("No accounts connected");
         return;
     }
 
@@ -99,12 +123,14 @@ tokenForm.addEventListener("submit", async (e) => {
     // Validate inputs
     if (parseInt(initialSupply) > parseInt(maxSupply)) {
         status.textContent = "Initial supply cannot exceed max supply.";
+        console.warn("Invalid input: initialSupply > maxSupply");
         return;
     }
 
     try {
         const deploymentFee = web3.utils.toWei("10", "ether");
         const gasPrice = await web3.eth.getGasPrice();
+        console.log("Deploying token with params:", { tokenName, tokenSymbol, initialSupply, maxSupply, mintable, feeCollectorOverride });
         status.textContent = "Deploying token...";
         const tx = await factory.methods
             .deployToken(tokenName, tokenSymbol, initialSupply, maxSupply, mintable, feeCollectorOverride)
@@ -114,6 +140,7 @@ tokenForm.addEventListener("submit", async (e) => {
                 gas: 4000000,
                 gasPrice: gasPrice
             });
+        console.log("Transaction successful:", tx);
         status.textContent = `New token deployed! Name: ${tokenName}, Symbol: ${tokenSymbol}, Address: ${tx.events.TokenDeployed.returnValues.tokenAddress}`;
     } catch (error) {
         status.textContent = `Deployment failed: ${error.message}`;
@@ -123,14 +150,22 @@ tokenForm.addEventListener("submit", async (e) => {
 
 // Check network on load
 window.addEventListener("load", async () => {
+    console.log("Window loaded, checking network");
     if (window.ethereum) {
-        const chainId = await web3.eth.getChainId();
-        if (chainId !== 8080) {
-            status.textContent = "Please switch to Shardeum Unstablenet (Chain ID: 8080) in MetaMask!";
-        } else {
-            status.textContent = "Ready. Connect MetaMask to proceed.";
+        try {
+            const chainId = await web3.eth.getChainId();
+            console.log("Chain ID:", chainId);
+            if (chainId !== 8080) {
+                status.textContent = "Please switch to Shardeum Unstablenet (Chain ID: 8080) in MetaMask!";
+            } else {
+                status.textContent = "Ready. Connect MetaMask to proceed.";
+            }
+        } catch (error) {
+            status.textContent = "Failed to check network. Ensure MetaMask is installed.";
+            console.error("Network Check Error:", error);
         }
     } else {
         status.textContent = "MetaMask not detected. Please install it.";
+        console.error("MetaMask not detected on window load");
     }
 });
