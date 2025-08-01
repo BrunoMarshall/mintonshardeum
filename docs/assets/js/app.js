@@ -1,4 +1,4 @@
-/ docs/assets/js/app.jsconst web3 = new Web3(window.ethereum);// Factory ABI
+const web3 = new Web3(window.ethereum); 
 const factoryABI = [
   {
     "inputs": [
