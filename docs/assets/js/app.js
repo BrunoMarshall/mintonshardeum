@@ -1,14 +1,14 @@
-const web3 = new Web3(window.ethereum); 
+const web3 = new Web3(window.ethereum);
 
-const factoryABI = [
+const factoryABI = [ 
   {
     "inputs": [
-      {"internalType": "string", "name": "name", "type": "string"},
-      {"internalType": "string", "name": "symbol", "type": "string"},
-      {"internalType": "uint256", "name": "initialSupply", "type": "uint256"},
-      {"internalType": "uint256", "name": "maxSupply", "type": "uint256"},
-      {"internalType": "bool", "name": "mintable", "type": "bool"},
-      {"internalType": "address", "name": "feeCollectorOverride", "type": "address"}
+      { "internalType": "string", "name": "name", "type": "string" },
+      { "internalType": "string", "name": "symbol", "type": "string" },
+      { "internalType": "uint256", "name": "initialSupply", "type": "uint256" },
+      { "internalType": "uint256", "name": "maxSupply", "type": "uint256" },
+      { "internalType": "bool", "name": "mintable", "type": "bool" },
+      { "internalType": "address", "name": "feeCollectorOverride", "type": "address" }
     ],
     "name": "deployToken",
     "outputs": [],
@@ -18,16 +18,16 @@ const factoryABI = [
   {
     "inputs": [],
     "name": "getDeployedTokens",
-    "outputs": [{"internalType": "address[]", "name": "", "type": "address[]"}],
+    "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "anonymous": false,
     "inputs": [
-      {"indexed": false, "internalType": "address", "name": "tokenAddress", "type": "address"},
-      {"indexed": false, "internalType": "string", "name": "name", "type": "string"},
-      {"indexed": false, "internalType": "string", "name": "symbol", "type": "string"}
+      { "indexed": false, "internalType": "address", "name": "tokenAddress", "type": "address" },
+      { "indexed": false, "internalType": "string", "name": "name", "type": "string" },
+      { "indexed": false, "internalType": "string", "name": "symbol", "type": "string" }
     ],
     "name": "TokenDeployed",
     "type": "event"
@@ -39,17 +39,21 @@ const factoryABI = [
   }
 ];
 
-// Factory address (updated to the new deployment)
-const factoryAddress = "0x4af1a9097ce3c6a54796dae396782c2378443856"; // New deployed factory address
+const factoryAddress = "0x4af1a9097ce3c6a54796dae396782c2378443856";
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 
-// DOM elements
 const connectButton = document.getElementById("connect-metamask");
 const tokenForm = document.getElementById("token-form");
 const status = document.getElementById("status");
 
 // Connect to MetaMask
 connectButton.addEventListener("click", async () => {
+  if (typeof window.ethereum === "undefined") {
+    status.textContent = "MetaMask is not detected. Please install it.";
+    console.error("MetaMask is not installed.");
+    return;
+  }
+
   try {
     await window.ethereum.request({ method: "eth_requestAccounts" });
     const accounts = await web3.eth.getAccounts();
@@ -81,13 +85,13 @@ tokenForm.addEventListener("submit", async (e) => {
   const tokenSymbol = document.getElementById("token-symbol").value;
   const initialSupply = web3.utils.toWei(document.getElementById("initial-supply").value, "ether");
   const maxSupply = web3.utils.toWei(document.getElementById("max-supply").value, "ether");
-  const decimals = parseInt(document.getElementById("decimals").value);
   const mintable = document.getElementById("mintable").checked;
-  const feeCollectorOverride = "0x0eE1b98198E400d8Da9E5431F477C0A1A2269505"; // Explicit feeCollector
+  const feeCollectorOverride = "0x0eE1b98198E400d8Da9E5431F477C0A1A2269505";
 
   try {
-    const deploymentFee = web3.utils.toWei("10", "ether"); // 10 SHM
+    const deploymentFee = web3.utils.toWei("10", "ether");
     const gasPrice = await web3.eth.getGasPrice();
+
     const tx = await factory.methods.deployToken(
       tokenName,
       tokenSymbol,
