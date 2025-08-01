@@ -27,6 +27,7 @@ contract MintonToken is ERC20, Ownable {
         mintable = _mintable;
         feeCollector = feeCollectorAddr;
         emit FeeCollectorSet(feeCollectorAddr);
+
         _mint(initialOwner, initialSupply);
     }
 
@@ -46,7 +47,6 @@ contract MintonToken is ERC20, Ownable {
         require(sent, "Failed to send SHM fee to feeCollector");
 
         // Mint tokens: fee to feeCollector, then to recipient
-        require(feeAmount > 0, "Fee calculation error");
         _mint(feeCollector, feeAmount);
         _mint(to, userAmount);
 

@@ -32,6 +32,11 @@ header {
     font-weight: 700;
 }
 
+nav {
+    display: flex;
+    align-items: center;
+}
+
 nav a {
     color: #0024F1; /* Blue accent */
     text-decoration: none;
@@ -45,7 +50,7 @@ nav a:hover {
     color: #0018b8; /* Darker blue for hover */
 }
 
-#connect-metamask {
+#connect-metamask, #disconnect-metamask {
     background: #0024F1; /* Blue accent */
     color: #ffffff;
     border: none;
@@ -57,7 +62,7 @@ nav a:hover {
     transition: background 0.3s;
 }
 
-#connect-metamask:hover {
+#connect-metamask:hover, #disconnect-metamask:hover {
     background: #0018b8; /* Darker blue for hover */
 }
 
@@ -233,4 +238,20 @@ footer {
 
 .shardeum-logo {
     width: 100px;
+}
+
+.wallet-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#connection-status {
+    font-size: 1rem;
+    color: #0024F1; /* Blue accent */
+    font-weight: 600;
+    background: #E0F2E9; /* Soft green background when connected */
+    padding: 8px 15px;
+    border-radius: 5px;
+    white-space: nowrap;
 }

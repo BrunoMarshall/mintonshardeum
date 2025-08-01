@@ -1,6 +1,5 @@
 const web3 = new Web3(window.ethereum);
-
-const factoryABI = [ 
+const factoryABI = [
   {
     "inputs": [
       { "internalType": "string", "name": "name", "type": "string" },
@@ -38,13 +37,52 @@ const factoryABI = [
     "type": "constructor"
   }
 ];
-
-const factoryAddress = "0x4af1a9097ce3c6a54796dae396782c2378443856";
+const factoryAddress = "0x20adb0e2472caa768cfa3ae671d4423878719225";
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
-
 const connectButton = document.getElementById("connect-metamask");
+const disconnectButton = document.getElementById("disconnect-metamask");
+const connectionStatus = document.getElementById("connection-status");
 const tokenForm = document.getElementById("token-form");
 const status = document.getElementById("status");
+
+// Map chain IDs to network names
+const networkNames = {
+  8080: "Shardeum Unstablenet",
+  8081: "Shardeum Testnet",
+  8082: "Shardeum Mainnet"
+};
+
+// Function to update connection status display
+async function updateConnectionStatus() {
+  try {
+    const accounts = await web3.eth.getAccounts();
+    const chainId = await web3.eth.getChainId();
+    const networkName = networkNames[chainId] || `Unknown Network (Chain ID: ${chainId})`;
+    if (accounts.length > 0) {
+      const account = accounts[0];
+      const shortAccount = `${account.slice(0, 6)}...${account.slice(-4)}`;
+      connectionStatus.textContent = `Network: ${networkName} | Wallet: ${shortAccount}`;
+      connectionStatus.style.display = "inline";
+      disconnectButton.style.display = "inline-block";
+      connectButton.style.display = "none";
+    } else {
+      connectionStatus.textContent = "";
+      connectionStatus.style.display = "none";
+      disconnectButton.style.display = "none";
+      connectButton.style.display = "inline-block";
+      connectButton.textContent = "Connect MetaMask";
+      connectButton.disabled = false;
+    }
+  } catch (error) {
+    console.error("Error updating connection status:", error);
+    connectionStatus.textContent = "";
+    connectionStatus.style.display = "none";
+    disconnectButton.style.display = "none";
+    connectButton.style.display = "inline-block";
+    connectButton.textContent = "Connect MetaMask";
+    connectButton.disabled = false;
+  }
+}
 
 // Connect to MetaMask
 connectButton.addEventListener("click", async () => {
@@ -53,45 +91,50 @@ connectButton.addEventListener("click", async () => {
     console.error("MetaMask is not installed.");
     return;
   }
-
   try {
     await window.ethereum.request({ method: "eth_requestAccounts" });
-    const accounts = await web3.eth.getAccounts();
-    if (accounts.length > 0) {
-      const account = accounts[0];
-      status.textContent = `Connected: ${account}`;
-      connectButton.textContent = "Connected";
-      connectButton.disabled = true;
-    } else {
-      status.textContent = "No accounts found. Please unlock MetaMask.";
-    }
+    await updateConnectionStatus();
+    status.textContent = "Connected to MetaMask!";
   } catch (error) {
     status.textContent = `Connection failed: ${error.message}. Ensure MetaMask is on Shardeum Unstablenet.`;
     console.error("MetaMask Error:", error);
   }
 });
 
+// Disconnect button handler
+disconnectButton.addEventListener("click", async () => {
+  try {
+    // Reset UI to disconnected state
+    connectionStatus.textContent = "";
+    connectionStatus.style.display = "none";
+    disconnectButton.style.display = "none";
+    connectButton.style.display = "inline-block";
+    connectButton.textContent = "Connect MetaMask";
+    connectButton.disabled = false;
+    status.textContent = "Disconnected from MetaMask.";
+  } catch (error) {
+    console.error("Disconnect Error:", error);
+    status.textContent = `Disconnect failed: ${error.message}`;
+  }
+});
+
 // Handle form submission to deploy new token
 tokenForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const accounts = await web3.eth.getAccounts();
   if (!accounts || accounts.length === 0) {
     status.textContent = "Please connect MetaMask first!";
     return;
   }
-
   const tokenName = document.getElementById("token-name").value;
   const tokenSymbol = document.getElementById("token-symbol").value;
   const initialSupply = web3.utils.toWei(document.getElementById("initial-supply").value, "ether");
   const maxSupply = web3.utils.toWei(document.getElementById("max-supply").value, "ether");
   const mintable = document.getElementById("mintable").checked;
   const feeCollectorOverride = "0x0eE1b98198E400d8Da9E5431F477C0A1A2269505";
-
   try {
     const deploymentFee = web3.utils.toWei("10", "ether");
     const gasPrice = await web3.eth.getGasPrice();
-
     const tx = await factory.methods.deployToken(
       tokenName,
       tokenSymbol,
@@ -105,7 +148,6 @@ tokenForm.addEventListener("submit", async (e) => {
       gas: 4000000,
       gasPrice: gasPrice
     });
-
     status.textContent = `New token deployed! Name: ${tokenName}, Symbol: ${tokenSymbol}, Address: ${tx.events.TokenDeployed.returnValues.tokenAddress}`;
   } catch (error) {
     status.textContent = `Deployment failed: ${error.message}`;
@@ -113,7 +155,7 @@ tokenForm.addEventListener("submit", async (e) => {
   }
 });
 
-// Check network on load
+// Check network and connection on load
 window.addEventListener("load", async () => {
   if (window.ethereum) {
     const chainId = await web3.eth.getChainId();
@@ -122,7 +164,14 @@ window.addEventListener("load", async () => {
     } else {
       status.textContent = "Ready. Connect MetaMask to proceed.";
     }
+    await updateConnectionStatus();
   } else {
     status.textContent = "MetaMask not detected. Please install it.";
   }
 });
+
+// Listen for account or network changes
+if (window.ethereum) {
+  window.ethereum.on("accountsChanged", updateConnectionStatus);
+  window.ethereum.on("chainChanged", updateConnectionStatus);
+}
