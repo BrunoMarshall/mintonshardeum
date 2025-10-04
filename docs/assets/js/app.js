@@ -277,7 +277,7 @@ tokenForm.addEventListener("submit", async (e) => {
       value: deploymentFee,
       maxFeePerGas: web3.utils.toWei('2500000', 'gwei'),
       maxPriorityFeePerGas: web3.utils.toWei('2500000', 'gwei'),
-      gas: 800000
+      gas: 3000000
     });
     
     // Extract token address from event
