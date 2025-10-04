@@ -50,7 +50,7 @@ const factoryABI = [
 ];
 
 // NEW CONTRACT ADDRESS
-const factoryAddress = "0xd0056b6ade1c238b27f0fa77eda0d7c86ab04a24";
+const factoryAddress = "0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4";
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 
 const connectButton = document.getElementById("connect-metamask");
