@@ -65,12 +65,117 @@ const tokenABI = [
 const factoryAddress = "0xd0056b6ade1c238b27f0fa77eda0d7c86ab04a24";
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 
+// Wallet connection elements
+const connectButton = document.getElementById("connect-metamask");
+const disconnectButton = document.getElementById("disconnect-metamask");
+const connectionStatus = document.getElementById("connection-status");
+
+// Shardeum network configuration
+const SHARDEUM_TESTNET = {
+  chainId: '0x1FB7',
+  chainName: 'Shardeum EVM Testnet',
+  nativeCurrency: {
+    name: 'Shardeum',
+    symbol: 'SHM',
+    decimals: 18
+  },
+  rpcUrls: ['https://api-mezame.shardeum.org/'],
+  blockExplorerUrls: ['https://explorer-mezame.shardeum.org/']
+};
+
+const networkNames = {
+  8119: "Shardeum EVM Testnet",
+  8080: "Shardeum Unstablenet (Deprecated)"
+};
+
+// Wallet connection functions
+async function addShardeumNetwork() {
+  try {
+    await window.ethereum.request({
+      method: 'wallet_addEthereumChain',
+      params: [SHARDEUM_TESTNET]
+    });
+    return true;
+  } catch (error) {
+    console.error("Error adding network:", error);
+    return false;
+  }
+}
+
+async function switchToShardeumNetwork() {
+  try {
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: SHARDEUM_TESTNET.chainId }]
+    });
+    return true;
+  } catch (error) {
+    if (error.code === 4902) {
+      return await addShardeumNetwork();
+    }
+    console.error("Error switching network:", error);
+    return false;
+  }
+}
+
+async function updateConnectionStatus() {
+  try {
+    const accounts = await web3.eth.getAccounts();
+    const chainId = Number(await web3.eth.getChainId());
+    const networkName = networkNames[chainId] || `Unknown Network (Chain ID: ${chainId})`;
+    
+    if (accounts.length > 0) {
+      const account = accounts[0];
+      const shortAccount = `${account.slice(0, 6)}...${account.slice(-4)}`;
+      connectionStatus.textContent = `${networkName} | ${shortAccount}`;
+      connectionStatus.style.display = "inline";
+      disconnectButton.style.display = "inline-block";
+      connectButton.style.display = "none";
+    } else {
+      connectionStatus.textContent = "";
+      connectionStatus.style.display = "none";
+      disconnectButton.style.display = "none";
+      connectButton.style.display = "inline-block";
+    }
+  } catch (error) {
+    console.error("Error updating connection status:", error);
+  }
+}
+
+// Connect button
+connectButton.addEventListener("click", async () => {
+  if (typeof window.ethereum === "undefined") {
+    alert("MetaMask is not detected. Please install it.");
+    window.open("https://metamask.io/download/", "_blank");
+    return;
+  }
+  
+  try {
+    await window.ethereum.request({ method: "eth_requestAccounts" });
+    const chainId = Number(await web3.eth.getChainId());
+    if (chainId !== 8119) {
+      await switchToShardeumNetwork();
+    }
+    await updateConnectionStatus();
+  } catch (error) {
+    console.error("MetaMask Error:", error);
+  }
+});
+
+// Disconnect button
+disconnectButton.addEventListener("click", async () => {
+  connectionStatus.textContent = "";
+  connectionStatus.style.display = "none";
+  disconnectButton.style.display = "none";
+  connectButton.style.display = "inline-block";
+});
+
+// Token display logic
 let allTokens = [];
 let filteredTokens = [];
 let currentPage = 1;
 const tokensPerPage = 12;
 
-// Fetch token details
 async function getTokenDetails(tokenAddress) {
   try {
     const tokenContract = new web3.eth.Contract(tokenABI, tokenAddress);
@@ -99,7 +204,6 @@ async function getTokenDetails(tokenAddress) {
   }
 }
 
-// Load all tokens
 async function loadTokens() {
   const container = document.getElementById('tokens-container');
   const totalTokensEl = document.getElementById('total-tokens');
@@ -107,7 +211,6 @@ async function loadTokens() {
   try {
     container.innerHTML = '<div class="loading">Loading tokens...</div>';
     
-    // Get all token addresses
     const tokenAddresses = await factory.methods.getDeployedTokens().call();
     
     if (tokenAddresses.length === 0) {
@@ -118,11 +221,9 @@ async function loadTokens() {
 
     totalTokensEl.textContent = tokenAddresses.length;
     
-    // Fetch details for all tokens (reverse to show newest first)
     const tokenPromises = tokenAddresses.reverse().map(addr => getTokenDetails(addr));
     const tokenDetails = await Promise.all(tokenPromises);
     
-    // Filter out any failed requests
     allTokens = tokenDetails.filter(token => token !== null);
     filteredTokens = [...allTokens];
     
@@ -134,7 +235,6 @@ async function loadTokens() {
   }
 }
 
-// Display tokens with pagination
 function displayTokens() {
   const container = document.getElementById('tokens-container');
   const start = (currentPage - 1) * tokensPerPage;
@@ -186,7 +286,6 @@ function displayTokens() {
   updatePagination();
 }
 
-// Format large numbers
 function formatNumber(num) {
   const number = parseFloat(num);
   if (number >= 1000000) {
@@ -197,7 +296,6 @@ function formatNumber(num) {
   return number.toFixed(2);
 }
 
-// Copy address to clipboard
 function copyAddress(address) {
   navigator.clipboard.writeText(address).then(() => {
     alert('Address copied to clipboard!');
@@ -206,7 +304,6 @@ function copyAddress(address) {
   });
 }
 
-// Update pagination controls
 function updatePagination() {
   const pagination = document.getElementById('pagination');
   const prevBtn = document.getElementById('prev-btn');
@@ -227,7 +324,6 @@ function updatePagination() {
   nextBtn.disabled = currentPage === totalPages;
 }
 
-// Search/filter tokens
 function filterTokens(searchTerm) {
   const term = searchTerm.toLowerCase();
   filteredTokens = allTokens.filter(token => 
@@ -265,7 +361,15 @@ document.getElementById('next-btn').addEventListener('click', () => {
   }
 });
 
-// Load tokens on page load
+// Initialize
 window.addEventListener('load', () => {
   loadTokens();
+  updateConnectionStatus();
 });
+
+if (window.ethereum) {
+  window.ethereum.on("accountsChanged", updateConnectionStatus);
+  window.ethereum.on("chainChanged", () => {
+    window.location.reload();
+  });
+}
