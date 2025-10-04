@@ -27,39 +27,33 @@
         <section class="minter">
             <h1>Minton's Token Forge</h1>
             <p>Create your own tokens on the Shardeum blockchain!</p>
+            <div class="fee-info">
+                <p><strong>Deployment Fee:</strong> 5000 SHM</p>
+                <p><small>All tokens minted go 100% to you</small></p>
+            </div>
             <form id="token-form">
                 <div class="form-group">
                     <label for="token-name">Token Name:</label>
-                    <input type="text" id="token-name" required pattern="[A-Za-z0-9\s]+">
+                    <input type="text" id="token-name" required pattern="[A-Za-z0-9\s]+" maxlength="50" placeholder="My Token">
                 </div>
                 <div class="form-group">
                     <label for="token-symbol">Token Symbol:</label>
-                    <input type="text" id="token-symbol" required pattern="[A-Za-z0-9]+" maxlength="5">
+                    <input type="text" id="token-symbol" required pattern="[A-Za-z0-9]+" maxlength="10" placeholder="MTK">
                 </div>
                 <div class="form-group">
                     <label for="initial-supply">Initial Supply:</label>
-                    <input type="number" id="initial-supply" required min="1" step="1">
+                    <input type="number" id="initial-supply" required min="1" step="1" placeholder="1000000">
                 </div>
                 <div class="form-group">
                     <label for="max-supply">Max Supply:</label>
-                    <input type="number" id="max-supply" required min="1" step="1">
-                </div>
-                <div class="form-group">
-                    <label for="decimals">Decimals:</label>
-                    <input type="number" id="decimals" required min="0" max="18" value="18">
+                    <input type="number" id="max-supply" required min="1" step="1" placeholder="1000000">
                 </div>
                 <div class="form-group">
                     <label for="mintable">Mintable:</label>
                     <input type="checkbox" id="mintable">
+                    <small style="margin-left: 10px; color: #666;">Allow minting more tokens later</small>
                 </div>
-                <div class="form-group">
-                    <label for="network">Network:</label>
-                    <select id="network" required>
-                        <option value="testnet">Shardeum Testnet</option>
-                        <option value="mainnet">Shardeum Mainnet</option>
-                    </select>
-                </div>
-                <button type="submit">Mint Token</button>
+                <button type="submit">Mint Token (5000 SHM)</button>
             </form>
             <p id="status"></p>
         </section>

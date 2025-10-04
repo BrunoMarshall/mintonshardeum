@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About MintonShardeum</title>
+    <title>About - MintonShardeum</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="icon" href="assets/images/mintonshardeum_favicon.png">
 </head>
@@ -13,27 +13,64 @@
         <nav>
             <a href="index.html">Home</a>
             <a href="about.html">About</a>
-            <button id="connect-metamask">Connect MetaMask</button>
+            <div id="wallet-info" class="wallet-info">
+                <button id="connect-metamask">Connect MetaMask</button>
+                <span id="connection-status" style="display: none;"></span>
+                <button id="disconnect-metamask" style="display: none;">Disconnect</button>
+            </div>
         </nav>
     </header>
     <main>
+        <section class="logo-section">
+            <img src="assets/images/mintonshardeum_logo.png" alt="MintonShardeum Logo" class="main-logo">
+        </section>
         <section class="about">
             <h1>About MintonShardeum</h1>
             <p>Welcome to MintonShardeum, where Minton, the token forger, crafts tokens on the Shardeum blockchain! Our mission is to make token creation accessible, secure, and scalable.</p>
+            
             <h2>The Logic Behind MintonShardeum</h2>
-            <p>MintonShardeum is a decentralized application (dApp) built on Shardeum, an EVM-based Layer 1 blockchain that uses dynamic state sharding for scalability and low-cost transactions. Our smart contract, written in Solidity, allows users to create ERC-20 tokens with customizable parameters such as name, symbol, supply, decimals, and mintability.</p>
+            <p>MintonShardeum is a decentralized application (dApp) built on Shardeum, an EVM-based Layer 1 blockchain that uses dynamic state sharding for scalability and low-cost transactions. Our smart contract, written in Solidity, allows users to create ERC-20 tokens with customizable parameters such as name, symbol, supply, and mintability.</p>
+            
             <h2>Smart Contract Details</h2>
             <p>The smart contract includes:</p>
             <ul>
-                <li>10 SHM minting fee per transaction.</li>
-                <li>0.1% of minted tokens sent to the fee collector wallet: <code>0x0eE1b98198E400d8Da9E5431F477C0A1A2269505</code>.</li>
-                <li>Support for Shardeum Testnet and Mainnet.</li>
-                <li>Mintable option to allow future minting.</li>
+                <li><strong>5000 SHM deployment fee</strong> - One-time platform usage fee</li>
+                <li><strong>100% token ownership</strong> - All minted tokens go directly to you</li>
+                <li><strong>Shardeum EVM Testnet support</strong> (Chain ID: 8119)</li>
+                <li><strong>Mintable option</strong> - Allow future minting up to max supply</li>
+                <li><strong>Security audited</strong> - Built with OpenZeppelin standards</li>
             </ul>
+            
+            <h2>Network Information</h2>
+            <div class="network-info">
+                <p><strong>Network Name:</strong> Shardeum EVM Testnet</p>
+                <p><strong>RPC URL:</strong> https://api-mezame.shardeum.org/</p>
+                <p><strong>Chain ID:</strong> 8119</p>
+                <p><strong>Block Explorer:</strong> <a href="https://explorer-mezame.shardeum.org/" target="_blank">https://explorer-mezame.shardeum.org/</a></p>
+                <p><strong>Factory Contract:</strong> <a href="https://explorer-mezame.shardeum.org/address/0xd0056b6ade1c238b27f0fa77eda0d7c86ab04a24" target="_blank">0xd0056b6ade1c238b27f0fa77eda0d7c86ab04a24</a></p>
+            </div>
+            
             <h2>Code Documentation</h2>
-            <p>View the full source code and documentation on our <a href="https://github.com/BrunoMarshall/mintonshardeum">GitHub repository</a>. The smart contract is deployed using Remix IDE, and the frontend is built with HTML, CSS, and JavaScript, using Web3.js to interact with MetaMask and the Shardeum network.</p>
+            <p>View the full source code and documentation on our <a href="https://github.com/BrunoMarshall/mintonshardeum" target="_blank">GitHub repository</a>. The smart contract is deployed using Remix IDE, and the frontend is built with HTML, CSS, and JavaScript, using Web3.js to interact with MetaMask and the Shardeum network.</p>
+            
             <h2>Security Measures</h2>
-            <p>We implement input validation to prevent SQL injection and XSS attacks, ensuring only alphanumeric characters are accepted for token names and symbols. The smart contract uses OpenZeppelin’s secure ERC-20 implementation.</p>
+            <p>We implement comprehensive security measures:</p>
+            <ul>
+                <li><strong>Input validation</strong> - Prevents malicious data entry</li>
+                <li><strong>Reentrancy protection</strong> - Guards against attack vectors</li>
+                <li><strong>Pausable contract</strong> - Emergency stop mechanism</li>
+                <li><strong>OpenZeppelin libraries</strong> - Industry-standard secure implementations</li>
+                <li><strong>Excess refund</strong> - Automatically returns overpayment</li>
+            </ul>
+            
+            <h2>How It Works</h2>
+            <ol>
+                <li>Connect your MetaMask wallet to Shardeum EVM Testnet</li>
+                <li>Fill in your token details (name, symbol, supply)</li>
+                <li>Pay 5000 SHM deployment fee</li>
+                <li>Receive your custom ERC-20 token instantly</li>
+                <li>You own and control 100% of your tokens</li>
+            </ol>
         </section>
     </main>
     <footer>
