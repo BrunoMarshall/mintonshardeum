@@ -211,6 +211,9 @@ async function loadTokens() {
   try {
     container.innerHTML = '<div class="loading">Loading tokens...</div>';
     
+    // Add a small delay before fetching
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     const tokenAddresses = await factory.methods.getDeployedTokens().call();
     
     if (tokenAddresses.length === 0) {
@@ -221,17 +224,35 @@ async function loadTokens() {
 
     totalTokensEl.textContent = tokenAddresses.length;
     
-    const tokenPromises = tokenAddresses.reverse().map(addr => getTokenDetails(addr));
-    const tokenDetails = await Promise.all(tokenPromises);
+    // Fetch token details in smaller batches to avoid rate limiting
+    const batchSize = 3;
+    allTokens = [];
     
-    allTokens = tokenDetails.filter(token => token !== null);
+    const reversedAddresses = [...tokenAddresses].reverse();
+    
+    for (let i = 0; i < reversedAddresses.length; i += batchSize) {
+      const batch = reversedAddresses.slice(i, i + batchSize);
+      const batchPromises = batch.map(addr => getTokenDetails(addr));
+      const batchResults = await Promise.all(batchPromises);
+      allTokens.push(...batchResults.filter(token => token !== null));
+      
+      // Add delay between batches
+      if (i + batchSize < reversedAddresses.length) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+    
     filteredTokens = [...allTokens];
-    
     displayTokens();
     
   } catch (error) {
     console.error('Error loading tokens:', error);
-    container.innerHTML = '<div class="error">Failed to load tokens. Please try again.</div>';
+    
+    if (error.message && error.message.includes('circuit breaker')) {
+      container.innerHTML = '<div class="error">⚠️ Network is busy. Please wait a moment.<br><button onclick="window.loadTokens()" style="margin-top: 15px; padding: 10px 20px; background: #0024F1; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">Retry</button></div>';
+    } else {
+      container.innerHTML = '<div class="error">Failed to load tokens. Please refresh the page or try again later.</div>';
+    }
   }
 }
 
@@ -360,6 +381,9 @@ document.getElementById('next-btn').addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 });
+
+// Make loadTokens accessible globally for retry button
+window.loadTokens = loadTokens;
 
 // Initialize
 window.addEventListener('load', () => {
