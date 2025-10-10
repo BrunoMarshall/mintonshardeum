@@ -1,4 +1,4 @@
-const web3 = new Web3('https://api-mezame.shardeum.org/');
+// Use web3 instance from app.js (already declared)
 
 const FACTORY_ADDRESS = "0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4";
 
@@ -34,12 +34,15 @@ function checkWalletAndLoadTokens() {
       loadUserTokens(accounts[0]);
     } else if (accounts.length === 0 && currentMode === 'auto') {
       console.log("⚠️ No wallet connected in auto mode");
-      document.getElementById('auto-token-info').innerHTML = `
-        <div class="info-banner">
-          <h3>🔗 Connect Your Wallet First</h3>
-          <p>Please connect your MetaMask wallet using the button above to auto-detect your tokens.</p>
-        </div>
-      `;
+      const infoDiv = document.getElementById('auto-token-info');
+      if (infoDiv) {
+        infoDiv.innerHTML = `
+          <div class="info-banner">
+            <h3>🔗 Connect Your Wallet First</h3>
+            <p>Please connect your MetaMask wallet using the button above to auto-detect your tokens.</p>
+          </div>
+        `;
+      }
     }
   }).catch(err => {
     console.error("Error checking wallet:", err);
@@ -57,29 +60,38 @@ if (window.ethereum) {
 }
 
 // Mode Switching
-document.querySelectorAll('.mode-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    console.log("🔀 Switching to mode:", btn.dataset.mode);
-    currentMode = btn.dataset.mode;
-    
-    // Update button states
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    
-    // Update mode displays
-    document.querySelectorAll('.submission-mode').forEach(m => m.classList.remove('active'));
-    document.getElementById(`${currentMode}-mode`).classList.add('active');
-    
-    // Reset
-    document.getElementById('submission-result').style.display = 'none';
-    
-    // If switching to auto, check wallet and load tokens
-    if (currentMode === 'auto') {
-      console.log("🔄 Auto mode activated");
-      checkWalletAndLoadTokens();
-    }
+const modeBtns = document.querySelectorAll('.mode-btn');
+if (modeBtns.length > 0) {
+  modeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      console.log("🔀 Switching to mode:", btn.dataset.mode);
+      currentMode = btn.dataset.mode;
+      
+      // Update button states
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Update mode displays
+      document.querySelectorAll('.submission-mode').forEach(m => m.classList.remove('active'));
+      const modeDiv = document.getElementById(`${currentMode}-mode`);
+      if (modeDiv) {
+        modeDiv.classList.add('active');
+      }
+      
+      // Reset
+      const resultDiv = document.getElementById('submission-result');
+      if (resultDiv) {
+        resultDiv.style.display = 'none';
+      }
+      
+      // If switching to auto, check wallet and load tokens
+      if (currentMode === 'auto') {
+        console.log("🔄 Auto mode activated");
+        checkWalletAndLoadTokens();
+      }
+    });
   });
-});
+}
 
 // AUTO MODE: Load user's tokens
 async function loadUserTokens(userAddress) {
@@ -87,6 +99,11 @@ async function loadUserTokens(userAddress) {
   
   const infoDiv = document.getElementById('auto-token-info');
   const formDiv = document.getElementById('auto-form');
+  
+  if (!infoDiv || !formDiv) {
+    console.error("Required elements not found");
+    return;
+  }
   
   try {
     infoDiv.innerHTML = '<p class="loading-text">🔍 Searching for your tokens...</p>';
@@ -182,6 +199,8 @@ function showTokenSelector(tokens) {
   console.log("📋 Displaying token selector");
   const infoDiv = document.getElementById('auto-token-info');
   
+  if (!infoDiv) return;
+  
   let html = '<div class="token-selector"><h3>Select Your Token:</h3>';
   tokens.forEach((token, index) => {
     html += `
@@ -212,100 +231,133 @@ function selectToken(token) {
   console.log("✅ Selecting token:", token);
   tokenData = token;
   
-  document.getElementById('auto-name').textContent = token.name;
-  document.getElementById('auto-symbol').textContent = token.symbol;
-  document.getElementById('auto-address').textContent = token.address;
-  document.getElementById('auto-decimals').textContent = token.decimals;
+  const nameEl = document.getElementById('auto-name');
+  const symbolEl = document.getElementById('auto-symbol');
+  const addressEl = document.getElementById('auto-address');
+  const decimalsEl = document.getElementById('auto-decimals');
   
-  document.getElementById('auto-token-info').style.display = 'none';
-  document.getElementById('auto-form').style.display = 'block';
+  if (nameEl) nameEl.textContent = token.name;
+  if (symbolEl) symbolEl.textContent = token.symbol;
+  if (addressEl) addressEl.textContent = token.address;
+  if (decimalsEl) decimalsEl.textContent = token.decimals;
+  
+  const infoDiv = document.getElementById('auto-token-info');
+  const formDiv = document.getElementById('auto-form');
+  
+  if (infoDiv) infoDiv.style.display = 'none';
+  if (formDiv) formDiv.style.display = 'block';
   
   console.log("📝 Token form displayed");
 }
 
 // AUTO MODE: Logo Upload
-document.getElementById('auto-logo-file').addEventListener('change', (e) => {
-  console.log("📷 Logo file selected (auto mode)");
-  handleLogoUpload(e, 'auto');
-});
+const autoLogoFile = document.getElementById('auto-logo-file');
+if (autoLogoFile) {
+  autoLogoFile.addEventListener('change', (e) => {
+    console.log("📷 Logo file selected (auto mode)");
+    handleLogoUpload(e, 'auto');
+  });
+}
 
 // AUTO MODE: Submit
-document.getElementById('auto-submit-btn').addEventListener('click', () => {
-  console.log("🚀 Auto submit clicked");
-  if (!tokenData.address || !logoFile) {
-    console.error("❌ Missing data:", { tokenData, logoFile });
-    alert('Missing token data or logo!');
-    return;
-  }
-  generateInstructions();
-});
+const autoSubmitBtn = document.getElementById('auto-submit-btn');
+if (autoSubmitBtn) {
+  autoSubmitBtn.addEventListener('click', () => {
+    console.log("🚀 Auto submit clicked");
+    if (!tokenData.address || !logoFile) {
+      console.error("❌ Missing data:", { tokenData, logoFile });
+      alert('Missing token data or logo!');
+      return;
+    }
+    generateInstructions();
+  });
+}
 
 // MANUAL MODE: Verify
-document.getElementById('manual-verify-btn').addEventListener('click', async () => {
-  console.log("🔍 Manual verify clicked");
-  const address = document.getElementById('manual-address').value.trim();
-  
-  if (!address || !web3.utils.isAddress(address)) {
-    alert('Please enter a valid contract address!');
-    return;
-  }
-  
-  const btn = document.getElementById('manual-verify-btn');
-  btn.textContent = '⏳ Verifying...';
-  btn.disabled = true;
-  
-  try {
-    console.log("📡 Verifying token:", address);
-    const contract = new web3.eth.Contract(ERC20_ABI, address);
-    const [name, symbol, decimals] = await Promise.all([
-      contract.methods.name().call(),
-      contract.methods.symbol().call(),
-      contract.methods.decimals().call()
-    ]);
+const manualVerifyBtn = document.getElementById('manual-verify-btn');
+if (manualVerifyBtn) {
+  manualVerifyBtn.addEventListener('click', async () => {
+    console.log("🔍 Manual verify clicked");
+    const addressInput = document.getElementById('manual-address');
+    if (!addressInput) return;
     
-    console.log("✅ Token verified:", { name, symbol, decimals });
+    const address = addressInput.value.trim();
     
-    tokenData = {
-      address: web3.utils.toChecksumAddress(address),
-      name,
-      symbol,
-      decimals: Number(decimals)
-    };
+    if (!address || !web3.utils.isAddress(address)) {
+      alert('Please enter a valid contract address!');
+      return;
+    }
     
-    document.getElementById('manual-name').textContent = name;
-    document.getElementById('manual-symbol').textContent = symbol;
-    document.getElementById('manual-decimals').textContent = decimals;
+    const btn = manualVerifyBtn;
+    btn.textContent = '⏳ Verifying...';
+    btn.disabled = true;
     
-    document.getElementById('manual-token-info').style.display = 'block';
-    document.getElementById('manual-logo-section').style.display = 'block';
-    
-    alert(`✅ Token verified!\n\nName: ${name}\nSymbol: ${symbol}`);
-    
-  } catch (error) {
-    console.error("❌ Verification failed:", error);
-    alert('❌ Failed to verify token. Make sure:\n- Address is correct\n- Contract is on Shardeum testnet\n- Contract implements ERC-20');
-  } finally {
-    btn.textContent = '🔍 Verify Contract';
-    btn.disabled = false;
-  }
-});
+    try {
+      console.log("📡 Verifying token:", address);
+      const contract = new web3.eth.Contract(ERC20_ABI, address);
+      const [name, symbol, decimals] = await Promise.all([
+        contract.methods.name().call(),
+        contract.methods.symbol().call(),
+        contract.methods.decimals().call()
+      ]);
+      
+      console.log("✅ Token verified:", { name, symbol, decimals });
+      
+      tokenData = {
+        address: web3.utils.toChecksumAddress(address),
+        name,
+        symbol,
+        decimals: Number(decimals)
+      };
+      
+      const nameEl = document.getElementById('manual-name');
+      const symbolEl = document.getElementById('manual-symbol');
+      const decimalsEl = document.getElementById('manual-decimals');
+      
+      if (nameEl) nameEl.textContent = name;
+      if (symbolEl) symbolEl.textContent = symbol;
+      if (decimalsEl) decimalsEl.textContent = decimals;
+      
+      const infoDiv = document.getElementById('manual-token-info');
+      const logoSection = document.getElementById('manual-logo-section');
+      
+      if (infoDiv) infoDiv.style.display = 'block';
+      if (logoSection) logoSection.style.display = 'block';
+      
+      alert(`✅ Token verified!\n\nName: ${name}\nSymbol: ${symbol}`);
+      
+    } catch (error) {
+      console.error("❌ Verification failed:", error);
+      alert('❌ Failed to verify token. Make sure:\n- Address is correct\n- Contract is on Shardeum testnet\n- Contract implements ERC-20');
+    } finally {
+      btn.textContent = '🔍 Verify Contract';
+      btn.disabled = false;
+    }
+  });
+}
 
 // MANUAL MODE: Logo Upload
-document.getElementById('manual-logo-file').addEventListener('change', (e) => {
-  console.log("📷 Logo file selected (manual mode)");
-  handleLogoUpload(e, 'manual');
-});
+const manualLogoFile = document.getElementById('manual-logo-file');
+if (manualLogoFile) {
+  manualLogoFile.addEventListener('change', (e) => {
+    console.log("📷 Logo file selected (manual mode)");
+    handleLogoUpload(e, 'manual');
+  });
+}
 
 // MANUAL MODE: Submit
-document.getElementById('manual-form').addEventListener('submit', (e) => {
-  e.preventDefault();
-  console.log("🚀 Manual submit clicked");
-  if (!tokenData.address || !logoFile) {
-    alert('Please verify token and upload logo!');
-    return;
-  }
-  generateInstructions();
-});
+const manualForm = document.getElementById('manual-form');
+if (manualForm) {
+  manualForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    console.log("🚀 Manual submit clicked");
+    if (!tokenData.address || !logoFile) {
+      alert('Please verify token and upload logo!');
+      return;
+    }
+    generateInstructions();
+  });
+}
 
 // Shared Logo Upload Handler
 function handleLogoUpload(e, mode) {
@@ -316,6 +368,11 @@ function handleLogoUpload(e, mode) {
   const validationDiv = document.getElementById(`${mode}-logo-validation`);
   const previewDiv = document.getElementById(`${mode}-logo-preview`);
   const submitBtn = document.getElementById(`${mode}-submit-btn`);
+  
+  if (!validationDiv || !previewDiv || !submitBtn) {
+    console.error("Required elements not found");
+    return;
+  }
   
   validationDiv.innerHTML = '';
   validationDiv.className = 'validation-message';
@@ -457,6 +514,8 @@ function generateInstructions() {
   `;
   
   const resultDiv = document.getElementById('submission-result');
+  if (!resultDiv) return;
+  
   resultDiv.innerHTML = instructions;
   resultDiv.style.display = 'block';
   
@@ -466,13 +525,16 @@ function generateInstructions() {
     resultDiv.scrollIntoView({ behavior: 'smooth' });
   }, 100);
   
-  document.getElementById('download-logo-btn').addEventListener('click', () => {
-    console.log("📥 Downloading logo");
-    const link = document.createElement('a');
-    link.download = logoFileName;
-    link.href = logoDataUrl;
-    link.click();
-  });
+  const downloadBtn = document.getElementById('download-logo-btn');
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', () => {
+      console.log("📥 Downloading logo");
+      const link = document.createElement('a');
+      link.download = logoFileName;
+      link.href = logoDataUrl;
+      link.click();
+    });
+  }
 }
 
 function escapeHtml(text) {
@@ -482,7 +544,10 @@ function escapeHtml(text) {
 }
 
 function copyCode() {
-  const code = document.getElementById('token-json').textContent;
+  const codeEl = document.getElementById('token-json');
+  if (!codeEl) return;
+  
+  const code = codeEl.textContent;
   navigator.clipboard.writeText(code).then(() => {
     const btn = event.target;
     const original = btn.textContent;
