@@ -430,7 +430,7 @@ function handleLogoUpload(e, mode) {
   reader.readAsDataURL(file);
 }
 
-// Generate Instructions
+// Generate Instructions - SIMPLIFIED VERSION
 function generateInstructions() {
   console.log("📝 Generating instructions for:", tokenData);
   
@@ -451,13 +451,12 @@ function generateInstructions() {
 <div class="submission-instructions-simple">
   <div class="success-banner">
     <h2>📋 Ready to Submit!</h2>
-    <p>Follow these 2 GitHub steps to list <strong>${tokenData.symbol}</strong></p>
+    <p>Follow these 2 simple steps to list <strong>${tokenData.symbol}</strong></p>
   </div>
   
   <div class="what-is-pr-box">
     <h3>❓ What's a "Pull Request"?</h3>
-    <p>It's GitHub's way of suggesting changes. You'll upload your logo and edit our token list, then "propose" those changes to us. We review and approve - usually within 24 hours!</p>
-    <p><strong>Don't worry</strong> - it's easier than it sounds. Just follow the steps below! 🎯</p>
+    <p>It's GitHub's way of suggesting changes. You'll upload your logo and add your token info, then we review and approve - usually within 24 hours!</p>
   </div>
   
   <div class="step-box">
@@ -467,22 +466,18 @@ function generateInstructions() {
     </div>
     
     <div class="step-content">
-      <p><strong>First, download your validated logo:</strong></p>
-      <button id="download-logo-btn" class="btn-download">
-        📥 Download ${logoFileName}
-      </button>
+      <p><strong>Upload your logo with the correct name: <code>${logoFileName}</code></strong></p>
       
-      <p style="margin-top: 20px;"><strong>Then upload it to GitHub:</strong></p>
       <ol class="simple-steps">
-        <li>Click here to open the upload page: <a href="https://github.com/BrunoMarshall/MintonDex/upload/main/logos" target="_blank" class="inline-link">MintonDex/logos folder ↗</a></li>
-        <li>Click the <strong>"choose your files"</strong> button</li>
-        <li>Select the <code>${logoFileName}</code> file you just downloaded</li>
-        <li>At the bottom, click <strong>"Propose changes"</strong> (this creates a Pull Request)</li>
-        <li>On the next page, click the green <strong>"Create pull request"</strong> button</li>
+        <li>Click here: <a href="https://github.com/BrunoMarshall/MintonDex/upload/main/logos" target="_blank" class="inline-link">Upload to MintonDex/logos ↗</a></li>
+        <li>Rename your file to: <code>${logoFileName}</code></li>
+        <li>Drag and drop your logo or click "choose your files"</li>
+        <li>Scroll down and click <strong>"Propose changes"</strong></li>
+        <li>Click the green <strong>"Create pull request"</strong> button</li>
       </ol>
       
       <div class="tip-box">
-        💡 <strong>Tip:</strong> GitHub will ask you to "fork" the repository - just click "Fork this repository" when prompted. This is normal!
+        💡 <strong>Tip:</strong> GitHub might ask you to "fork" the repository - just click "Fork this repository" when prompted. This is normal!
       </div>
     </div>
   </div>
@@ -494,7 +489,7 @@ function generateInstructions() {
     </div>
     
     <div class="step-content">
-      <p><strong>First, copy your token's JSON:</strong></p>
+      <p><strong>Copy your token's JSON:</strong></p>
       <div class="code-box-simple">
         <div class="code-actions">
           <button class="btn-copy-code" onclick="copyCode()">📋 Copy Token Entry</button>
@@ -502,18 +497,18 @@ function generateInstructions() {
         <pre><code id="token-json">${escapeHtml(jsonWithComma)}</code></pre>
       </div>
       
-      <p style="margin-top: 20px;"><strong>Then add it to the token list:</strong></p>
+      <p style="margin-top: 20px;"><strong>Add it to the token list:</strong></p>
       <ol class="simple-steps">
-        <li>Click here to edit the file: <a href="https://github.com/BrunoMarshall/MintonDex/edit/main/tokenlist.json" target="_blank" class="inline-link">Edit tokenlist.json ↗</a></li>
-        <li>Scroll to the bottom of the file, find the last token entry</li>
-        <li><strong>Important:</strong> Add a <strong>comma</strong> after the last <code>}</code> (before your entry)</li>
+        <li>Click here: <a href="https://github.com/BrunoMarshall/MintonDex/edit/main/tokenlist.json" target="_blank" class="inline-link">Edit tokenlist.json ↗</a></li>
+        <li>Scroll to the bottom, find the last token entry</li>
+        <li><strong>Important:</strong> Add a comma after the last <code>}</code></li>
         <li>Paste your copied JSON</li>
-        <li>At the bottom, click <strong>"Propose changes"</strong></li>
+        <li>Scroll down and click <strong>"Propose changes"</strong></li>
         <li>Click the green <strong>"Create pull request"</strong> button</li>
       </ol>
       
       <div class="warning-note">
-        ⚠️ <strong>Common Mistake:</strong> Forgetting the comma! The file should look like:
+        ⚠️ <strong>Don't forget the comma!</strong> It should look like:
         <pre style="font-size: 0.85rem; margin-top: 10px;">  },  ← Add comma here!
   {
     "address": "YOUR_ADDRESS",
@@ -523,12 +518,11 @@ function generateInstructions() {
   </div>
   
   <div class="final-note">
-    <h3>✅ You're Done!</h3>
-    <p>You've created 2 Pull Requests. We'll review them and merge within <strong>24 hours</strong>.</p>
-    <p>You'll get a notification on GitHub when they're approved! 🎉</p>
+    <h3>✅ Done!</h3>
+    <p>You created 2 Pull Requests. We'll review and approve within <strong>24 hours</strong>!</p>
     
     <div class="token-summary-box">
-      <h4>Your Submitted Token:</h4>
+      <h4>Your Token:</h4>
       <p><strong>${tokenData.symbol}</strong> - ${tokenData.name}</p>
       <p><code>${tokenData.address}</code></p>
       <a href="https://explorer-mezame.shardeum.org/address/${tokenData.address}" target="_blank">View on Explorer ↗</a>
@@ -556,17 +550,6 @@ function generateInstructions() {
   setTimeout(() => {
     resultDiv.scrollIntoView({ behavior: 'smooth' });
   }, 100);
-  
-  const downloadBtn = document.getElementById('download-logo-btn');
-  if (downloadBtn) {
-    downloadBtn.addEventListener('click', () => {
-      console.log("📥 Downloading logo");
-      const link = document.createElement('a');
-      link.download = logoFileName;
-      link.href = logoDataUrl;
-      link.click();
-    });
-  }
 }
 
 function escapeHtml(text) {
@@ -601,7 +584,6 @@ window.copyCode = copyCode;
 // Initialize on page load
 window.addEventListener("load", () => {
   console.log("🎬 Submit token page loaded");
-  // Check wallet connection after a short delay to let app.js initialize
   setTimeout(checkWalletAndLoadTokens, 500);
 });
 
