@@ -14,9 +14,9 @@
         <a href="index.html">Home</a>
         <a href="tokens.html">Tokens</a>
         <a href="about.html">About</a>
-        <a href="submit-token.html">Submit to DEX</a>
+        <a href="submit-token.html">List token on MintonDEX</a>
         <a href="https://mintondex.com/" target="_blank" class="dex-link">
-            <span class="dex-icon">🔄</span> Trade on DEX
+            <span class="dex-icon">🔄</span> Trade on MintonDEX
         </a>
         <div id="wallet-info" class="wallet-info">
             <button id="connect-metamask">Connect MetaMask</button>
@@ -39,16 +39,13 @@
                     <span class="stat-value" id="total-tokens">Loading...</span>
                 </div>
             </div>
-
             <div class="tokens-filter">
                 <input type="text" id="search-input" placeholder="Search by name, symbol, or address...">
                 <button id="refresh-btn">Refresh</button>
             </div>
-
             <div id="tokens-container" class="tokens-grid">
                 <div class="loading">Loading tokens...</div>
             </div>
-
             <div id="pagination" class="pagination" style="display: none;">
                 <button id="prev-btn" disabled>Previous</button>
                 <span id="page-info">Page 1</span>
