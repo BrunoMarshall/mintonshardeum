@@ -33,36 +33,51 @@
         
         <section class="minter">
             <h1>🚀 List Your Token on MintonDEX</h1>
-            <p>Choose your submission method</p>
+            <p>Simple 3-step process via GitHub (takes ~5 minutes)</p>
+            
+            <!-- Clear Expectations Banner -->
+            <div class="expectations-banner">
+                <h3>📋 What You'll Need to Do:</h3>
+                <div class="expectation-steps">
+                    <div class="expect-step">
+                        <span class="expect-icon">1️⃣</span>
+                        <span>Prepare your logo (we'll help validate it)</span>
+                    </div>
+                    <div class="expect-step">
+                        <span class="expect-icon">2️⃣</span>
+                        <span>Upload logo to our GitHub (via web interface)</span>
+                    </div>
+                    <div class="expect-step">
+                        <span class="expect-icon">3️⃣</span>
+                        <span>Add your token info to our list (copy-paste JSON)</span>
+                    </div>
+                </div>
+                <p class="expect-note">💡 <strong>Why GitHub?</strong> It keeps our token list open, transparent, and secure. You'll create a "Pull Request" - don't worry, we'll guide you!</p>
+            </div>
             
             <!-- Mode Selection -->
             <div class="mode-selector">
                 <button class="mode-btn active" data-mode="auto">
                     <span class="mode-icon">⚡</span>
                     <span class="mode-title">Quick Submit</span>
-                    <span class="mode-desc">Just minted? We'll auto-fill everything!</span>
+                    <span class="mode-desc">Auto-detect your minted tokens</span>
                 </button>
                 <button class="mode-btn" data-mode="manual">
                     <span class="mode-icon">✍️</span>
                     <span class="mode-title">Manual Submit</span>
-                    <span class="mode-desc">For tokens minted elsewhere</span>
+                    <span class="mode-desc">Enter any token address</span>
                 </button>
             </div>
             
             <!-- AUTO MODE -->
             <div id="auto-mode" class="submission-mode active">
-                <div class="info-banner">
-                    <h3>✨ Token Auto-Detected!</h3>
-                    <p>We found your recently minted token. Just upload a logo and you're done!</p>
-                </div>
-                
                 <div id="auto-token-info" class="token-info-display">
-                    <p class="loading-text">🔍 Checking for recent tokens from your wallet...</p>
+                    <p class="loading-text">🔍 Connect your wallet to detect your tokens...</p>
                 </div>
                 
                 <div id="auto-form" style="display: none;">
                     <div class="form-section">
-                        <h2>Token Details (Auto-Filled)</h2>
+                        <h2>✅ Token Detected</h2>
                         
                         <div class="info-grid">
                             <div class="info-item">
@@ -85,7 +100,9 @@
                     </div>
                     
                     <div class="form-section">
-                        <h2>Upload Logo</h2>
+                        <h2>📷 Step 1: Validate Your Logo</h2>
+                        <p class="step-description">Upload your logo here to validate it meets requirements. You'll upload it to GitHub in the next step.</p>
+                        
                         <div class="logo-upload-area">
                             <input type="file" id="auto-logo-file" accept=".png" style="display: none;">
                             <div class="upload-box" onclick="document.getElementById('auto-logo-file').click()">
@@ -98,8 +115,18 @@
                             <div id="auto-logo-validation" class="validation-message"></div>
                         </div>
                         
+                        <div class="requirements-box">
+                            <strong>Requirements:</strong>
+                            <ul>
+                                <li>✅ Exactly 256x256 pixels</li>
+                                <li>✅ PNG format</li>
+                                <li>✅ Under 200KB</li>
+                                <li>✅ Transparent background (recommended)</li>
+                            </ul>
+                        </div>
+                        
                         <button id="auto-submit-btn" class="btn-primary" disabled>
-                            🚀 Generate Submission Guide
+                            Continue to GitHub Instructions →
                         </button>
                     </div>
                 </div>
@@ -107,11 +134,6 @@
             
             <!-- MANUAL MODE -->
             <div id="manual-mode" class="submission-mode">
-                <div class="info-banner warning">
-                    <h3>📝 Manual Token Submission</h3>
-                    <p>For tokens not minted on MintonShardeum or if auto-detection fails</p>
-                </div>
-                
                 <form id="manual-form">
                     <div class="form-section">
                         <h2>Token Information</h2>
@@ -120,6 +142,7 @@
                             <label for="manual-address">Token Contract Address *</label>
                             <input type="text" id="manual-address" required 
                                    placeholder="0x..." pattern="^0x[a-fA-F0-9]{40}$">
+                            <small>Shardeum EVM Testnet (Chain ID: 8119)</small>
                         </div>
                         
                         <button type="button" id="manual-verify-btn" class="btn-secondary">
@@ -145,7 +168,9 @@
                     </div>
                     
                     <div id="manual-logo-section" class="form-section" style="display: none;">
-                        <h2>Upload Logo</h2>
+                        <h2>📷 Step 1: Validate Your Logo</h2>
+                        <p class="step-description">Upload your logo here to validate it meets requirements.</p>
+                        
                         <div class="logo-upload-area">
                             <input type="file" id="manual-logo-file" accept=".png" style="display: none;">
                             <div class="upload-box" onclick="document.getElementById('manual-logo-file').click()">
@@ -158,8 +183,17 @@
                             <div id="manual-logo-validation" class="validation-message"></div>
                         </div>
                         
+                        <div class="requirements-box">
+                            <strong>Requirements:</strong>
+                            <ul>
+                                <li>✅ Exactly 256x256 pixels</li>
+                                <li>✅ PNG format</li>
+                                <li>✅ Under 200KB</li>
+                            </ul>
+                        </div>
+                        
                         <button type="submit" id="manual-submit-btn" class="btn-primary" disabled>
-                            🚀 Generate Submission Guide
+                            Continue to GitHub Instructions →
                         </button>
                     </div>
                 </form>

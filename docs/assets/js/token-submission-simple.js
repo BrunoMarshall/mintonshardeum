@@ -444,14 +444,20 @@ function generateInstructions() {
     logoURI: `https://raw.githubusercontent.com/BrunoMarshall/MintonDex/main/logos/${logoFileName}`
   };
   
-  const jsonString = JSON.stringify(tokenEntry, null, 6);
-  const jsonWithComma = ',\n    ' + jsonString.split('\n').join('\n    ');
+  const jsonString = JSON.stringify(tokenEntry, null, 2);
+  const jsonWithComma = ',\n' + jsonString.split('\n').map(line => '    ' + line).join('\n');
   
   const instructions = `
 <div class="submission-instructions-simple">
   <div class="success-banner">
-    <h2>🎉 Almost There!</h2>
-    <p>Just 2 simple steps to list <strong>${tokenData.symbol}</strong> on MintonDEX</p>
+    <h2>📋 Ready to Submit!</h2>
+    <p>Follow these 2 GitHub steps to list <strong>${tokenData.symbol}</strong></p>
+  </div>
+  
+  <div class="what-is-pr-box">
+    <h3>❓ What's a "Pull Request"?</h3>
+    <p>It's GitHub's way of suggesting changes. You'll upload your logo and edit our token list, then "propose" those changes to us. We review and approve - usually within 24 hours!</p>
+    <p><strong>Don't worry</strong> - it's easier than it sounds. Just follow the steps below! 🎯</p>
   </div>
   
   <div class="step-box">
@@ -459,16 +465,26 @@ function generateInstructions() {
       <span class="step-num">1</span>
       <h3>Upload Logo to GitHub</h3>
     </div>
-    <ol class="simple-steps">
-      <li>Download your logo using the button below</li>
-      <li>Go to: <a href="https://github.com/BrunoMarshall/MintonDex/upload/main/logos" target="_blank">MintonDex/logos folder</a></li>
-      <li>Click "choose your files" and upload <code>${logoFileName}</code></li>
-      <li>Commit with message: <code>Add ${tokenData.symbol} logo</code></li>
-    </ol>
     
-    <button id="download-logo-btn" class="btn-download">
-      📥 Download Logo (${logoFileName})
-    </button>
+    <div class="step-content">
+      <p><strong>First, download your validated logo:</strong></p>
+      <button id="download-logo-btn" class="btn-download">
+        📥 Download ${logoFileName}
+      </button>
+      
+      <p style="margin-top: 20px;"><strong>Then upload it to GitHub:</strong></p>
+      <ol class="simple-steps">
+        <li>Click here to open the upload page: <a href="https://github.com/BrunoMarshall/MintonDex/upload/main/logos" target="_blank" class="inline-link">MintonDex/logos folder ↗</a></li>
+        <li>Click the <strong>"choose your files"</strong> button</li>
+        <li>Select the <code>${logoFileName}</code> file you just downloaded</li>
+        <li>At the bottom, click <strong>"Propose changes"</strong> (this creates a Pull Request)</li>
+        <li>On the next page, click the green <strong>"Create pull request"</strong> button</li>
+      </ol>
+      
+      <div class="tip-box">
+        💡 <strong>Tip:</strong> GitHub will ask you to "fork" the repository - just click "Fork this repository" when prompted. This is normal!
+      </div>
+    </div>
   </div>
   
   <div class="step-box">
@@ -476,39 +492,55 @@ function generateInstructions() {
       <span class="step-num">2</span>
       <h3>Add Token to List</h3>
     </div>
-    <ol class="simple-steps">
-      <li>Go to: <a href="https://github.com/BrunoMarshall/MintonDex/edit/main/tokenlist.json" target="_blank">Edit tokenlist.json</a></li>
-      <li>Find the last token entry (before the closing <code>]</code>)</li>
-      <li>Add a <strong>comma</strong> after the last <code>}</code></li>
-      <li>Paste the code below</li>
-      <li>Commit with message: <code>Add ${tokenData.symbol} token</code></li>
-    </ol>
     
-    <div class="code-box-simple">
-      <div class="code-actions">
-        <button class="btn-copy-code" onclick="copyCode()">📋 Copy Token Entry</button>
+    <div class="step-content">
+      <p><strong>First, copy your token's JSON:</strong></p>
+      <div class="code-box-simple">
+        <div class="code-actions">
+          <button class="btn-copy-code" onclick="copyCode()">📋 Copy Token Entry</button>
+        </div>
+        <pre><code id="token-json">${escapeHtml(jsonWithComma)}</code></pre>
       </div>
-      <pre><code id="token-json">${escapeHtml(jsonWithComma)}</code></pre>
-    </div>
-    
-    <div class="warning-note">
-      ⚠️ <strong>Important:</strong> Make sure there's a comma after the previous token!
+      
+      <p style="margin-top: 20px;"><strong>Then add it to the token list:</strong></p>
+      <ol class="simple-steps">
+        <li>Click here to edit the file: <a href="https://github.com/BrunoMarshall/MintonDex/edit/main/tokenlist.json" target="_blank" class="inline-link">Edit tokenlist.json ↗</a></li>
+        <li>Scroll to the bottom of the file, find the last token entry</li>
+        <li><strong>Important:</strong> Add a <strong>comma</strong> after the last <code>}</code> (before your entry)</li>
+        <li>Paste your copied JSON</li>
+        <li>At the bottom, click <strong>"Propose changes"</strong></li>
+        <li>Click the green <strong>"Create pull request"</strong> button</li>
+      </ol>
+      
+      <div class="warning-note">
+        ⚠️ <strong>Common Mistake:</strong> Forgetting the comma! The file should look like:
+        <pre style="font-size: 0.85rem; margin-top: 10px;">  },  ← Add comma here!
+  {
+    "address": "YOUR_ADDRESS",
+    ...</pre>
+      </div>
     </div>
   </div>
   
   <div class="final-note">
-    <h3>✅ That's It!</h3>
-    <p>After both commits, <strong>create a pull request</strong>:</p>
-    <a href="https://github.com/BrunoMarshall/MintonDex/compare" target="_blank" class="btn-github-large">
-      Create Pull Request →
-    </a>
-    <p class="review-time">We'll review and approve within 24 hours!</p>
+    <h3>✅ You're Done!</h3>
+    <p>You've created 2 Pull Requests. We'll review them and merge within <strong>24 hours</strong>.</p>
+    <p>You'll get a notification on GitHub when they're approved! 🎉</p>
+    
+    <div class="token-summary-box">
+      <h4>Your Submitted Token:</h4>
+      <p><strong>${tokenData.symbol}</strong> - ${tokenData.name}</p>
+      <p><code>${tokenData.address}</code></p>
+      <a href="https://explorer-mezame.shardeum.org/address/${tokenData.address}" target="_blank">View on Explorer ↗</a>
+    </div>
   </div>
   
-  <div class="token-summary-box">
-    <h4>Your Token:</h4>
-    <p><strong>${tokenData.symbol}</strong> - ${tokenData.name}</p>
-    <p><code>${tokenData.address}</code></p>
+  <div class="help-box">
+    <h3>Need Help?</h3>
+    <p>
+      <a href="https://github.com/BrunoMarshall/MintonDex/issues/new" target="_blank">📝 Open GitHub Issue</a> •
+      <a href="https://discord.com/invite/shardeum" target="_blank">💬 Discord Support</a>
+    </p>
   </div>
 </div>
   `;
@@ -558,6 +590,9 @@ function copyCode() {
       btn.style.background = '';
     }, 2000);
     console.log("✅ Code copied to clipboard");
+  }).catch(err => {
+    console.error("Copy failed:", err);
+    alert('Failed to copy. Please select and copy manually.');
   });
 }
 
