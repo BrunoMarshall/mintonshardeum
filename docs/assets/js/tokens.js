@@ -101,6 +101,14 @@ async function getCurrentNetworkConfig() {
 }
 
 async function loadTokens() {
+  const tokenContainer = document.getElementById('tokens-container');
+  
+  // Check if element exists
+  if (!tokenContainer) {
+    console.error('Token container element not found');
+    return;
+  }
+  
   try {
     const config = await getCurrentNetworkConfig();
     const factory = new web3.eth.Contract(factoryABI, config.factoryAddress);
@@ -108,14 +116,15 @@ async function loadTokens() {
     const tokenAddresses = await factory.methods.getDeployedTokens().call();
     
     if (!tokenAddresses || tokenAddresses.length === 0) {
-      document.getElementById('token-grid').innerHTML = 
-        '<p style="text-align: center; color: #666;">No tokens deployed yet on ' + 
+      tokenContainer.innerHTML = 
+        '<p style="text-align: center; color: #666; padding: 40px;">No tokens deployed yet on ' + 
         (currentNetwork === 'TESTNET' ? 'Testnet' : 'Mainnet') + '</p>';
       return;
     }
     
-    const tokenGrid = document.getElementById('token-grid');
-    tokenGrid.innerHTML = '';
+    const tokenGrid = document.createElement('div');
+    tokenGrid.className = 'tokens-grid';
+    tokenContainer.innerHTML = '';
     
     for (const address of tokenAddresses) {
       try {
@@ -144,10 +153,13 @@ async function loadTokens() {
         console.error(`Error loading token ${address}:`, tokenError);
       }
     }
+    
+    tokenContainer.appendChild(tokenGrid);
+    
   } catch (error) {
     console.error('Error loading tokens:', error);
-    document.getElementById('token-grid').innerHTML = 
-      '<p style="text-align: center; color: #FF6B6B;">Error loading tokens. Please make sure you\'re connected to the correct network.</p>';
+    tokenContainer.innerHTML = 
+      '<p style="text-align: center; color: #FF6B6B; padding: 40px;">Error loading tokens. Please make sure you\'re connected to the correct network.</p>';
   }
 }
 
@@ -190,23 +202,6 @@ if (networkToggle) {
   });
 }
 
-// Theme toggle
-const themeToggleBtn = document.getElementById('theme-toggle-btn');
-if (themeToggleBtn) {
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  if (savedTheme === 'dark') {
-    document.body.classList.add('dark-mode');
-    themeToggleBtn.textContent = '🌙';
-  }
-
-  themeToggleBtn.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    themeToggleBtn.textContent = isDark ? '🌙' : '☀️';
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  });
-}
-
 // Load on page load
 window.addEventListener('load', async () => {
   updateNetworkIndicator();
@@ -219,7 +214,10 @@ window.addEventListener('load', async () => {
       window.location.reload();
     });
   } else {
-    document.getElementById('token-grid').innerHTML = 
-      '<p style="text-align: center; color: #FF6B6B;">Please install MetaMask to view tokens.</p>';
+    const tokenContainer = document.getElementById('tokens-container');
+    if (tokenContainer) {
+      tokenContainer.innerHTML = 
+        '<p style="text-align: center; color: #FF6B6B; padding: 40px;">Please install MetaMask to view tokens.</p>';
+    }
   }
 });

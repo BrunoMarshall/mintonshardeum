@@ -10,68 +10,92 @@
 </head>
 <body class="mainnet-mode">
     <header>
-        <div class="header-title">Mint On Shardeum</div>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="tokens.html">Tokens</a>
-            <a href="about.html">About</a>
-            <a href="submit-token.html">List token on MintonDEX</a>
-            <a href="https://mintondex.com/" target="_blank" class="dex-link">
-                <span class="dex-icon">🔄</span> Trade on MintonDEX
-            </a>
-            <div class="header-theme-toggle">
-                <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle dark/light mode"☀️</button>
-            </div>
-            <div class="header-network-toggle">
-                <div id="network-indicator" class="network-indicator mainnet">🟢 MAINNET</div>
-                <label class="network-switch">
-                    <input type="checkbox" id="network-toggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div id="wallet-info" class="wallet-info">
-                <button id="connect-metamask">Connect MetaMask</button>
-                <span id="connection-status" style="display: none;"></span>
-                <button id="disconnect-metamask" style="display: none;">Disconnect</button>
-            </div>
-        </nav>
-    </header>
+    <div class="header-title">Mint On Shardeum</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="tokens.html">Tokens</a>
+        <a href="about.html">About</a>
+        <a href="submit-token.html">List token on MintonDEX</a>
+        <a href="https://mintondex.com/" target="_blank" class="dex-link">
+            <span class="dex-icon">🔄</span> Trade on MintonDEX
+        </a>
+        
+        <!-- Network Toggle -->
+        <div class="header-network-toggle">
+            <div id="network-indicator" class="network-indicator mainnet">🟢 MAINNET</div>
+            <label class="network-switch">
+                <input type="checkbox" id="network-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <div id="wallet-info" class="wallet-info">
+            <button id="connect-metamask">Connect MetaMask</button>
+            <span id="connection-status" style="display: none;"></span>
+            <button id="disconnect-metamask" style="display: none;">Disconnect</button>
+        </div>
+    </nav>
+</header>
     <main>
         <section class="logo-section">
             <img src="assets/images/mintonshardeum_logo.png" alt="MintonShardeum Logo" class="main-logo">
         </section>
-        <section class="about-section">
+        <section class="about">
             <h1>About MintonShardeum</h1>
-            <p>Your gateway to creating custom tokens on the Shardeum blockchain</p>
-            <div class="about-content">
-                <h2>What is MintonShardeum?</h2>
-                <p>MintonShardeum is a user-friendly platform that allows anyone to create their own ERC-20 tokens on the Shardeum blockchain without any coding knowledge.</p>
+            <p>Welcome to MintonShardeum, where Minton, the token forger, crafts tokens on the Shardeum blockchain! Our mission is to make token creation accessible, secure, and scalable.</p>
+            
+            <h2>The Logic Behind MintonShardeum</h2>
+            <p>MintonShardeum is a decentralized application (dApp) built on Shardeum, an EVM-based Layer 1 blockchain that uses dynamic state sharding for scalability and low-cost transactions. Our smart contract, written in Solidity, allows users to create ERC-20 tokens with customizable parameters such as name, symbol, supply, and mintability.</p>
+            
+            <h2>Smart Contract Details</h2>
+            <p>The smart contract includes:</p>
+            <ul>
+                <li><strong>5000 SHM deployment fee</strong> - One-time platform usage fee</li>
+                <li><strong>100% token ownership</strong> - All minted tokens go directly to you</li>
+                <li><strong>Multi-network support</strong> - Deploy on Testnet or Mainnet</li>
+                <li><strong>Mintable option</strong> - Allow future minting up to max supply</li>
+                <li><strong>Security audited</strong> - Built with OpenZeppelin standards</li>
+            </ul>
+            
+            <h2>Network Information</h2>
+            <div class="network-info">
+                <h3>Shardeum Mainnet</h3>
+                <p><strong>Network Name:</strong> Shardeum</p>
+                <p><strong>RPC URL:</strong> https://api.shardeum.org/</p>
+                <p><strong>Chain ID:</strong> 8118</p>
+                <p><strong>Block Explorer:</strong> <a href="https://explorer.shardeum.org/" target="_blank">https://explorer.shardeum.org/</a></p>
+                <p><strong>Factory Contract:</strong> <a href="https://explorer.shardeum.org/address/0x294665ec45ab8668d922474f63a03e33416d8deb" target="_blank">0x294665ec45ab8668d922474f63a03e33416d8deb</a></p>
                 
-                <h2>Features</h2>
-                <ul>
-                    <li>Easy token creation in minutes</li>
-                    <li>Full ERC-20 standard compliance</li>
-                    <li>Customizable token parameters</li>
-                    <li>Low deployment fees</li>
-                    <li>Support for both Mainnet and Testnet</li>
-                </ul>
-                
-                <h2>How It Works</h2>
-                <ol>
-                    <li>Connect your MetaMask wallet</li>
-                    <li>Choose your network (Mainnet or Testnet)</li>
-                    <li>Fill in your token details</li>
-                    <li>Pay the deployment fee (5,000 SHM)</li>
-                    <li>Confirm the transaction</li>
-                    <li>Your token is deployed!</li>
-                </ol>
-                
-                <h2>Why Shardeum?</h2>
-                <p>Shardeum is a scalable, secure, and low-cost blockchain perfect for deploying tokens. With linear scalability and low fees, it's ideal for both developers and users.</p>
-                
-                <h2>Contact & Support</h2>
-                <p>For questions or support, join our community on Discord or reach out through GitHub.</p>
+                <h3 style="margin-top: 20px;">Shardeum EVM Testnet</h3>
+                <p><strong>Network Name:</strong> Shardeum EVM Testnet</p>
+                <p><strong>RPC URL:</strong> https://api-mezame.shardeum.org/</p>
+                <p><strong>Chain ID:</strong> 8119</p>
+                <p><strong>Block Explorer:</strong> <a href="https://explorer-mezame.shardeum.org/" target="_blank">https://explorer-mezame.shardeum.org/</a></p>
+                <p><strong>Factory Contract:</strong> <a href="https://explorer-mezame.shardeum.org/address/0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4" target="_blank">0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4</a></p>
             </div>
+            
+            <h2>Code Documentation</h2>
+            <p>View the full source code and documentation on our <a href="https://github.com/BrunoMarshall/mintonshardeum" target="_blank">GitHub repository</a>. The smart contract is deployed using Remix IDE, and the frontend is built with HTML, CSS, and JavaScript, using Web3.js to interact with MetaMask and the Shardeum network.</p>
+            
+            <h2>Security Measures</h2>
+            <p>We implement comprehensive security measures:</p>
+            <ul>
+                <li><strong>Input validation</strong> - Prevents malicious data entry</li>
+                <li><strong>Reentrancy protection</strong> - Guards against attack vectors</li>
+                <li><strong>Pausable contract</strong> - Emergency stop mechanism</li>
+                <li><strong>OpenZeppelin libraries</strong> - Industry-standard secure implementations</li>
+                <li><strong>Excess refund</strong> - Automatically returns overpayment</li>
+            </ul>
+            
+            <h2>How It Works</h2>
+            <ol>
+                <li>Connect your MetaMask wallet to Shardeum</li>
+                <li>Choose your network (Mainnet or Testnet)</li>
+                <li>Fill in your token details (name, symbol, supply)</li>
+                <li>Pay 5000 SHM deployment fee</li>
+                <li>Receive your custom ERC-20 token instantly</li>
+                <li>You own and control 100% of your tokens</li>
+            </ol>
         </section>
     </main>
     <footer>
