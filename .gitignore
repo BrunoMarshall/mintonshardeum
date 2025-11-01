@@ -1,17 +1,241 @@
-node_modules
+# Minton Project - .gitignore
+
+# ===========================
+# Operating System Files
+# ===========================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.directory
+
+# ===========================
+# IDE & Editor Files
+# ===========================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+.history/
+
+# JetBrains (WebStorm, IntelliJ, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.*.sw[a-z]
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ===========================
+# Node.js & npm
+# ===========================
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json  # Optional: remove if you want to track it
+yarn.lock         # Optional: remove if you want to track it
+
+# Build outputs
+dist/
+build/
+*.log
+
+# ===========================
+# Environment & Secrets
+# ===========================
+
+# Environment variables
 .env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
 
-# Hardhat files
-/cache
-/artifacts
+# Private keys
+*.pem
+*.key
+*.p12
+*.pfx
 
-# TypeChain files
-/typechain
-/typechain-types
+# Secrets
+secrets.json
+config.local.js
 
-# solidity-coverage files
-/coverage
-/coverage.json
+# ===========================
+# Blockchain Development
+# ===========================
 
-# Hardhat Ignition default folder for deployments against a local node
-ignition/deployments/chain-31337
+# Hardhat
+cache/
+artifacts/
+typechain/
+typechain-types/
+
+# Truffle
+build/
+
+# Remix backups
+.workspaces/
+*.sol.backup
+
+# Contract deployments (if you don't want to track)
+# deployments/
+# .openzeppelin/
+
+# ===========================
+# Testing & Coverage
+# ===========================
+
+# Test coverage
+coverage/
+coverage.json
+*.lcov
+.nyc_output/
+
+# Test outputs
+test-results/
+junit.xml
+
+# ===========================
+# Backup & Temporary Files
+# ===========================
+
+# Backups
+*.backup
+*.bak
+*.old
+*.orig
+*~
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.cache
+
+# ===========================
+# Build & Distribution
+# ===========================
+
+# Compiled files
+*.js.map
+*.css.map
+
+# Production builds
+# docs/  # Uncomment if you don't want to track docs folder
+
+# ===========================
+# Documentation
+# ===========================
+
+# Generated docs
+docs/_build/
+site/
+
+# ===========================
+# Logs
+# ===========================
+
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ===========================
+# Miscellaneous
+# ===========================
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Image backups
+*.psd
+
+# Lock files (optional)
+# Uncomment if you don't want to track these
+# package-lock.json
+# yarn.lock
+
+# ===========================
+# Project Specific
+# ===========================
+
+# Local development
+local/
+.local/
+
+# User-specific files
+*.user
+
+# Deployment artifacts
+deployment-receipts/
+
+# Private notes
+NOTES.md
+TODO.md
+
+# ===========================
+# Optional: Web3 & Wallets
+# ===========================
+
+# Wallet files (NEVER commit these!)
+keystore/
+wallets/
+*.keystore
+
+# Mnemonic phrases (NEVER commit these!)
+mnemonic.txt
+seed.txt
+
+# ===========================
+# Comments
+# ===========================
+
+# This gitignore is configured for the Minton project
+# Adjust based on your specific needs
+
+# SECURITY WARNING:
+# Never commit:
+# - Private keys
+# - Mnemonic phrases  
+# - API keys
+# - Environment variables with secrets
+# - Wallet files
