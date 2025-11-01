@@ -1590,3 +1590,50 @@ body.mainnet-mode::before {
   color: #11998e !important;
   border-left: 4px solid #11998e;
 }
+/* Token Card Footer - Side by side layout */
+.token-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+/* Add to MetaMask Button - Matches network badge style */
+.add-to-metamask-btn {
+  border: none;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  flex: 1;
+  color: white;
+}
+
+.add-to-metamask-btn.testnet {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.add-to-metamask-btn.mainnet {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+}
+
+.add-to-metamask-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.add-to-metamask-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.add-to-metamask-btn:active {
+  transform: translateY(0);
+}

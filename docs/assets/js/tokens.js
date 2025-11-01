@@ -182,17 +182,23 @@ async function loadTokens() {
         
         const tokenCard = document.createElement('div');
         tokenCard.className = 'token-card';
+        
+        // Match button style to network badge
+        const buttonClass = currentNetwork === 'TESTNET' ? 'testnet' : 'mainnet';
+        
         tokenCard.innerHTML = `
           <h3>${name} (${symbol})</h3>
           <p><strong>Address:</strong> <a href="${config.explorerUrl}/address/${address}" target="_blank">${address.slice(0, 10)}...${address.slice(-8)}</a></p>
           <p><strong>Supply:</strong> ${web3.utils.fromWei(totalSupply, 'ether')} / ${web3.utils.fromWei(maxSupply, 'ether')}</p>
           <p><strong>Mintable:</strong> ${mintable ? 'Yes' : 'No'}</p>
-          <p class="network-badge ${currentNetwork === 'TESTNET' ? 'testnet' : 'mainnet'}">
-            ${currentNetwork === 'TESTNET' ? '🔧 Testnet' : '🟢 Mainnet'}
-          </p>
-          <button class="add-to-metamask-btn" data-address="${address}" data-symbol="${symbol}" data-decimals="${decimals}">
-            🦊 Add to MetaMask
-          </button>
+          <div class="token-card-footer">
+            <span class="network-badge ${buttonClass}">
+              ${currentNetwork === 'TESTNET' ? '🔧 Testnet' : '🟢 Mainnet'}
+            </span>
+            <button class="add-to-metamask-btn ${buttonClass}" data-address="${address}" data-symbol="${symbol}" data-decimals="${decimals}">
+              🦊 Add to MetaMask
+            </button>
+          </div>
         `;
         
         tokenContainer.appendChild(tokenCard);

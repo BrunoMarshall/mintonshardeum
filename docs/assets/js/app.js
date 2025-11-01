@@ -97,24 +97,6 @@ const tokenForm = document.getElementById("token-form");
 const status = document.getElementById("status");
 const networkToggle = document.getElementById("network-toggle");
 const networkIndicator = document.getElementById("network-indicator");
-const themeToggleBtn = document.getElementById("theme-toggle-btn");
-
-// Theme toggle functionality
-if (themeToggleBtn) {
-  // Load saved theme
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  if (savedTheme === 'dark') {
-    document.body.classList.add('dark-mode');
-    themeToggleBtn.textContent = '🌙';
-  }
-
-  themeToggleBtn.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    themeToggleBtn.textContent = isDark ? '🌙' : '☀️';
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  });
-}
 
 // Update network indicator styling
 function updateNetworkIndicator() {
@@ -239,7 +221,7 @@ async function updateConnectionStatus() {
           status.style.color = "#FF6B6B";
         } else {
           status.textContent = `✓ Connected to ${config.chainName}`;
-          status.style.color = currentNetwork === 'TESTNET' ? "#4a5568" : "#48bb78";
+          status.style.color = currentNetwork === 'TESTNET' ? "#667eea" : "#48bb78";
         }
       }
     } else {
@@ -302,7 +284,7 @@ if (connectButton) {
       await updateConnectionStatus();
       if (status) {
         status.textContent = "✓ Connected to MetaMask!";
-        status.style.color = currentNetwork === 'TESTNET' ? "#4a5568" : "#48bb78";
+        status.style.color = currentNetwork === 'TESTNET' ? "#667eea" : "#48bb78";
       }
     } catch (error) {
       const message = `❌ Connection failed: ${error.message}`;
@@ -424,9 +406,9 @@ if (tokenForm) {
       status.innerHTML = `✓ Token deployed successfully on ${config.chainName}!<br>
         <strong>Name:</strong> ${tokenName}<br>
         <strong>Symbol:</strong> ${tokenSymbol}<br>
-        <strong>Address:</strong> <a href="${config.explorerUrl}/address/${tokenAddress}" target="_blank" style="color: ${currentNetwork === 'TESTNET' ? '#4a5568' : '#48bb78'};">${tokenAddress}</a><br>
-        <strong>Transaction:</strong> <a href="${config.explorerUrl}/tx/${tx.transactionHash}" target="_blank" style="color: ${currentNetwork === 'TESTNET' ? '#4a5568' : '#48bb78'};">View on Explorer</a>`;
-      status.style.color = currentNetwork === 'TESTNET' ? "#4a5568" : "#48bb78";
+        <strong>Address:</strong> <a href="${config.explorerUrl}/address/${tokenAddress}" target="_blank" style="color: ${currentNetwork === 'TESTNET' ? '#667eea' : '#48bb78'};">${tokenAddress}</a><br>
+        <strong>Transaction:</strong> <a href="${config.explorerUrl}/tx/${tx.transactionHash}" target="_blank" style="color: ${currentNetwork === 'TESTNET' ? '#667eea' : '#48bb78'};">View on Explorer</a>`;
+      status.style.color = currentNetwork === 'TESTNET' ? "#667eea" : "#48bb78";
       
       tokenForm.reset();
       
@@ -476,7 +458,7 @@ window.addEventListener("load", async () => {
         status.style.color = "#FFA500";
       } else {
         status.textContent = `Ready. Connect MetaMask to deploy tokens on ${config.chainName}.`;
-        status.style.color = currentNetwork === 'TESTNET' ? "#4a5568" : "#48bb78";
+        status.style.color = currentNetwork === 'TESTNET' ? "#667eea" : "#48bb78";
       }
     }
     
