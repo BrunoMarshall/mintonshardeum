@@ -13,7 +13,7 @@ const NETWORKS = {
     },
     rpcUrls: ['https://api-mezame.shardeum.org/'],
     blockExplorerUrls: ['https://explorer-mezame.shardeum.org/'],
-    factoryAddress: '0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4', // Your current testnet factory
+    factoryAddress: '0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4', // testnet factory Address
     explorerUrl: 'https://explorer-mezame.shardeum.org'
   },
   MAINNET: {
@@ -27,7 +27,7 @@ const NETWORKS = {
     },
     rpcUrls: ['https://api.shardeum.org/'],
     blockExplorerUrls: ['https://explorer.shardeum.org/'],
-    factoryAddress: '0xYOUR_MAINNET_FACTORY_ADDRESS_HERE', // You'll update this after deployment
+    factoryAddress: '0x294665ec45ab8668d922474f63a03e33416d8deb', // MAINNET factoryAddress
     explorerUrl: 'https://explorer.shardeum.org'
   }
 };
