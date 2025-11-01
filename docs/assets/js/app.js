@@ -98,6 +98,36 @@ const status = document.getElementById("status");
 const networkToggle = document.getElementById("network-toggle");
 const networkIndicator = document.getElementById("network-indicator");
 
+// Function to add token to MetaMask
+async function addTokenToMetaMask(address, symbol, decimals = 18, logoUrl = null) {
+  try {
+    const wasAdded = await window.ethereum.request({
+      method: 'wallet_watchAsset',
+      params: {
+        type: 'ERC20',
+        options: {
+          address: address,
+          symbol: symbol,
+          decimals: decimals,
+          image: logoUrl
+        },
+      },
+    });
+
+    if (wasAdded) {
+      console.log('Token added to MetaMask!');
+      return true;
+    } else {
+      console.log('Token addition cancelled');
+      return false;
+    }
+  } catch (error) {
+    console.error('Error adding token to MetaMask:', error);
+    alert('Failed to add token to MetaMask. Please try again.');
+    return false;
+  }
+}
+
 // Update network indicator styling
 function updateNetworkIndicator() {
   if (!networkIndicator) return;
@@ -403,12 +433,44 @@ if (tokenForm) {
         tokenAddress = tx.events.TokenDeployed.returnValues.tokenAddress;
       }
       
-      status.innerHTML = `✓ Token deployed successfully on ${config.chainName}!<br>
-        <strong>Name:</strong> ${tokenName}<br>
-        <strong>Symbol:</strong> ${tokenSymbol}<br>
-        <strong>Address:</strong> <a href="${config.explorerUrl}/address/${tokenAddress}" target="_blank" style="color: ${currentNetwork === 'TESTNET' ? '#667eea' : '#48bb78'};">${tokenAddress}</a><br>
-        <strong>Transaction:</strong> <a href="${config.explorerUrl}/tx/${tx.transactionHash}" target="_blank" style="color: ${currentNetwork === 'TESTNET' ? '#667eea' : '#48bb78'};">View on Explorer</a>`;
-      status.style.color = currentNetwork === 'TESTNET' ? "#667eea" : "#48bb78";
+      const linkColor = currentNetwork === 'TESTNET' ? '#667eea' : '#48bb78';
+      const buttonClass = currentNetwork === 'TESTNET' ? 'testnet' : 'mainnet';
+      
+      status.innerHTML = `
+        <div style="text-align: left;">
+          <strong style="color: ${linkColor};">✓ Token deployed successfully on ${config.chainName}!</strong><br><br>
+          <strong>Name:</strong> ${tokenName}<br>
+          <strong>Symbol:</strong> ${tokenSymbol}<br>
+          <strong>Address:</strong> <a href="${config.explorerUrl}/address/${tokenAddress}" target="_blank" style="color: ${linkColor};">${tokenAddress}</a><br>
+          <strong>Transaction:</strong> <a href="${config.explorerUrl}/tx/${tx.transactionHash}" target="_blank" style="color: ${linkColor};">View on Explorer</a><br><br>
+          <button id="add-deployed-token-btn" class="add-to-metamask-btn ${buttonClass}" style="margin-top: 10px;">
+            🦊 Add ${tokenSymbol} to MetaMask
+          </button>
+        </div>
+      `;
+      status.style.color = linkColor;
+      
+      // Add event listener to the "Add to MetaMask" button
+      const addButton = document.getElementById('add-deployed-token-btn');
+      if (addButton) {
+        addButton.addEventListener('click', async () => {
+          addButton.textContent = '⏳ Adding...';
+          addButton.disabled = true;
+          
+          const success = await addTokenToMetaMask(tokenAddress, tokenSymbol, 18);
+          
+          if (success) {
+            addButton.textContent = '✅ Added to MetaMask!';
+            setTimeout(() => {
+              addButton.textContent = `🦊 Add ${tokenSymbol} to MetaMask`;
+              addButton.disabled = false;
+            }, 3000);
+          } else {
+            addButton.textContent = `🦊 Add ${tokenSymbol} to MetaMask`;
+            addButton.disabled = false;
+          }
+        });
+      }
       
       tokenForm.reset();
       
