@@ -383,61 +383,60 @@
       showInstructions(window.currentManualToken, window.manualLogoData);
     });
   }
-
-  function showInstructions(token, logoData) {
-    const result = document.getElementById('submission-result');
-    
-    const fileName = `${token.symbol.toLowerCase()}.png`;
-    
-    const jsonEntry = {
-      "name": token.name,
-      "address": token.address,
-      "symbol": token.symbol,
-      "decimals": parseInt(token.decimals),
-      "chainId": currentNetwork === 'TESTNET' ? 8119 : 8118,
-      "logoURI": `https://raw.githubusercontent.com/BrunoMarshall/mintonshardeum/main/tokens/logos/${fileName}`
-    };
-    
-    result.innerHTML = `
-      <div style="background: #f8f9fa; padding: 30px; border-radius: 12px; margin-top: 30px;">
-        <h2 style="color: #48bb78;">✅ Ready to Submit!</h2>
-        
-        <h3 style="margin-top: 30px;">📝 Step 2: Upload Logo to GitHub</h3>
-        <ol style="line-height: 2; text-align: left;">
-          <li>Go to: <a href="https://github.com/BrunoMarshall/mintonshardeum/tree/main/tokens/logos" target="_blank" style="color: #0024F1;">GitHub Logos Folder</a></li>
-          <li>Click "Add file" → "Upload files"</li>
-          <li>Download your validated logo: <button onclick="window.downloadLogo('${logoData}', '${fileName}')" style="background: #48bb78; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-left: 10px;">📥 Download ${fileName}</button></li>
-          <li>Upload the downloaded file to GitHub</li>
-          <li>Commit with message: "Add ${token.symbol} logo"</li>
-        </ol>
-        
-        <h3 style="margin-top: 30px;">📝 Step 3: Add Token to List</h3>
-        <ol style="line-height: 2; text-align: left;">
-          <li>Go to: <a href="https://github.com/BrunoMarshall/mintonshardeum/blob/main/tokens/tokenlist.json" target="_blank" style="color: #0024F1;">tokenlist.json</a></li>
-          <li>Click the "Edit" (pencil) icon</li>
-          <li>Copy this JSON and add it to the "tokens" array:</li>
-        </ol>
-        
-        <div style="background: #2d3748; color: #e2e8f0; padding: 20px; border-radius: 8px; margin: 20px 0; position: relative;">
-          <button onclick="window.copyJSON()" style="position: absolute; top: 10px; right: 10px; background: #48bb78; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">📋 Copy</button>
-          <pre id="json-code" style="margin: 0; overflow-x: auto; white-space: pre-wrap;">${JSON.stringify(jsonEntry, null, 2)}</pre>
-        </div>
-        
-        <ol start="4" style="line-height: 2; text-align: left;">
-          <li>Commit changes with message: "Add ${token.symbol} to tokenlist"</li>
-          <li>Create Pull Request</li>
-          <li>Wait for approval!</li>
-        </ol>
-        
-        <p style="margin-top: 30px; padding: 15px; background: #e6f7ff; border-left: 4px solid #0024F1; border-radius: 4px;">
-          💡 <strong>Need help?</strong> Join our <a href="https://discord.com/invite/shardeum" target="_blank" style="color: #0024F1;">Discord</a> for support!
-        </p>
+ function showInstructions(token, logoData) {
+  const result = document.getElementById('submission-result');
+  
+  const fileName = `${token.symbol.toLowerCase()}.png`;
+  
+  const jsonEntry = {
+    "name": token.name,
+    "address": token.address,
+    "symbol": token.symbol,
+    "decimals": parseInt(token.decimals),
+    "chainId": currentNetwork === 'TESTNET' ? 8119 : 8118,
+    "logoURI": `https://raw.githubusercontent.com/BrunoMarshall/MintonDex/main/logos/${fileName}`
+  };
+  
+  result.innerHTML = `
+    <div style="background: #f8f9fa; padding: 30px; border-radius: 12px; margin-top: 30px;">
+      <h2 style="color: #48bb78;">✅ Ready to Submit!</h2>
+      
+      <h3 style="margin-top: 30px;">📝 Step 2: Upload Logo to GitHub</h3>
+      <ol style="line-height: 2; text-align: left;">
+        <li>Go to: <a href="https://github.com/BrunoMarshall/MintonDex/tree/main/logos" target="_blank" style="color: #0024F1;">GitHub Logos Folder</a></li>
+        <li>Click "Add file" → "Upload files"</li>
+        <li>Download your validated logo: <button onclick="window.downloadLogo('${logoData}', '${fileName}')" style="background: #48bb78; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-left: 10px;">📥 Download ${fileName}</button></li>
+        <li>Upload the downloaded file to GitHub</li>
+        <li>Commit with message: "Add ${token.symbol} logo"</li>
+      </ol>
+      
+      <h3 style="margin-top: 30px;">📝 Step 3: Add Token to List</h3>
+      <ol style="line-height: 2; text-align: left;">
+        <li>Go to: <a href="https://github.com/BrunoMarshall/MintonDex/blob/main/tokenlist.json" target="_blank" style="color: #0024F1;">tokenlist.json</a></li>
+        <li>Click the "Edit" (pencil) icon</li>
+        <li>Copy this JSON and add it to the "tokens" array:</li>
+      </ol>
+      
+      <div style="background: #2d3748; color: #e2e8f0; padding: 20px; border-radius: 8px; margin: 20px 0; position: relative;">
+        <button onclick="window.copyJSON()" style="position: absolute; top: 10px; right: 10px; background: #48bb78; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">📋 Copy</button>
+        <pre id="json-code" style="margin: 0; overflow-x: auto; white-space: pre-wrap;">${JSON.stringify(jsonEntry, null, 2)}</pre>
       </div>
-    `;
-    
-    result.style.display = 'block';
-    result.scrollIntoView({ behavior: 'smooth' });
-  }
+      
+      <ol start="4" style="line-height: 2; text-align: left;">
+        <li>Commit changes with message: "Add ${token.symbol} to tokenlist"</li>
+        <li>Create Pull Request</li>
+        <li>Wait for approval!</li>
+      </ol>
+      
+      <p style="margin-top: 30px; padding: 15px; background: #e6f7ff; border-left: 4px solid #0024F1; border-radius: 4px;">
+        💡 <strong>Need help?</strong> Join our <a href="https://discord.com/invite/shardeum" target="_blank" style="color: #0024F1;">Discord</a> for support!
+      </p>
+    </div>
+  `;
+  
+  result.style.display = 'block';
+  result.scrollIntoView({ behavior: 'smooth' });
+}
 
   // Make functions globally accessible
   window.downloadLogo = function(dataUrl, fileName) {
