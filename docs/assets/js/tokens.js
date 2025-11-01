@@ -102,8 +102,9 @@ async function getCurrentNetworkConfig() {
 
 async function loadTokens() {
   const tokenContainer = document.getElementById('tokens-container');
+  const totalTokensElement = document.getElementById('total-tokens');
   
-  // Check if element exists
+  // Check if elements exist
   if (!tokenContainer) {
     console.error('Token container element not found');
     return;
@@ -115,6 +116,11 @@ async function loadTokens() {
     
     const tokenAddresses = await factory.methods.getDeployedTokens().call();
     
+    // Update total tokens counter
+    if (totalTokensElement) {
+      totalTokensElement.textContent = tokenAddresses.length;
+    }
+    
     if (!tokenAddresses || tokenAddresses.length === 0) {
       tokenContainer.innerHTML = 
         '<p style="text-align: center; color: #666; padding: 40px;">No tokens deployed yet on ' + 
@@ -122,9 +128,9 @@ async function loadTokens() {
       return;
     }
     
-    const tokenGrid = document.createElement('div');
-    tokenGrid.className = 'tokens-grid';
+    // Clear container and set it up as a grid
     tokenContainer.innerHTML = '';
+    tokenContainer.className = 'tokens-grid';
     
     for (const address of tokenAddresses) {
       try {
@@ -148,16 +154,17 @@ async function loadTokens() {
           </p>
         `;
         
-        tokenGrid.appendChild(tokenCard);
+        tokenContainer.appendChild(tokenCard);
       } catch (tokenError) {
         console.error(`Error loading token ${address}:`, tokenError);
       }
     }
     
-    tokenContainer.appendChild(tokenGrid);
-    
   } catch (error) {
     console.error('Error loading tokens:', error);
+    if (totalTokensElement) {
+      totalTokensElement.textContent = 'Error';
+    }
     tokenContainer.innerHTML = 
       '<p style="text-align: center; color: #FF6B6B; padding: 40px;">Error loading tokens. Please make sure you\'re connected to the correct network.</p>';
   }
@@ -202,6 +209,18 @@ if (networkToggle) {
   });
 }
 
+// Refresh button handler
+const refreshBtn = document.getElementById('refresh-btn');
+if (refreshBtn) {
+  refreshBtn.addEventListener('click', async () => {
+    refreshBtn.textContent = 'Refreshing...';
+    refreshBtn.disabled = true;
+    await loadTokens();
+    refreshBtn.textContent = 'Refresh';
+    refreshBtn.disabled = false;
+  });
+}
+
 // Load on page load
 window.addEventListener('load', async () => {
   updateNetworkIndicator();
@@ -215,6 +234,11 @@ window.addEventListener('load', async () => {
     });
   } else {
     const tokenContainer = document.getElementById('tokens-container');
+    const totalTokensElement = document.getElementById('total-tokens');
+    
+    if (totalTokensElement) {
+      totalTokensElement.textContent = '0';
+    }
     if (tokenContainer) {
       tokenContainer.innerHTML = 
         '<p style="text-align: center; color: #FF6B6B; padding: 40px;">Please install MetaMask to view tokens.</p>';
