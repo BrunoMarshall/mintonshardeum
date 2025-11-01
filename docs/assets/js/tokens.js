@@ -78,6 +78,13 @@ const tokenABI = [
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
+    "stateMutability": "view",
+    "type": "function"
   }
 ];
 
@@ -97,6 +104,36 @@ async function getCurrentNetworkConfig() {
   } catch (error) {
     console.error("Error detecting network:", error);
     return NETWORKS.MAINNET;
+  }
+}
+
+// Function to add token to MetaMask
+async function addTokenToMetaMask(address, symbol, decimals, logoUrl = null) {
+  try {
+    const wasAdded = await window.ethereum.request({
+      method: 'wallet_watchAsset',
+      params: {
+        type: 'ERC20',
+        options: {
+          address: address,
+          symbol: symbol,
+          decimals: decimals,
+          image: logoUrl
+        },
+      },
+    });
+
+    if (wasAdded) {
+      console.log('Token added to MetaMask!');
+      return true;
+    } else {
+      console.log('Token addition cancelled');
+      return false;
+    }
+  } catch (error) {
+    console.error('Error adding token to MetaMask:', error);
+    alert('Failed to add token to MetaMask. Please try again.');
+    return false;
   }
 }
 
@@ -141,6 +178,7 @@ async function loadTokens() {
         const totalSupply = await token.methods.totalSupply().call();
         const maxSupply = await token.methods.maxSupply().call();
         const mintable = await token.methods.mintable().call();
+        const decimals = await token.methods.decimals().call();
         
         const tokenCard = document.createElement('div');
         tokenCard.className = 'token-card';
@@ -152,6 +190,9 @@ async function loadTokens() {
           <p class="network-badge ${currentNetwork === 'TESTNET' ? 'testnet' : 'mainnet'}">
             ${currentNetwork === 'TESTNET' ? '🔧 Testnet' : '🟢 Mainnet'}
           </p>
+          <button class="add-to-metamask-btn" data-address="${address}" data-symbol="${symbol}" data-decimals="${decimals}">
+            🦊 Add to MetaMask
+          </button>
         `;
         
         tokenContainer.appendChild(tokenCard);
@@ -159,6 +200,33 @@ async function loadTokens() {
         console.error(`Error loading token ${address}:`, tokenError);
       }
     }
+    
+    // Add click event listeners to all "Add to MetaMask" buttons
+    const addButtons = document.querySelectorAll('.add-to-metamask-btn');
+    addButtons.forEach(button => {
+      button.addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        const address = btn.getAttribute('data-address');
+        const symbol = btn.getAttribute('data-symbol');
+        const decimals = parseInt(btn.getAttribute('data-decimals'));
+        
+        btn.textContent = '⏳ Adding...';
+        btn.disabled = true;
+        
+        const success = await addTokenToMetaMask(address, symbol, decimals);
+        
+        if (success) {
+          btn.textContent = '✅ Added!';
+          setTimeout(() => {
+            btn.textContent = '🦊 Add to MetaMask';
+            btn.disabled = false;
+          }, 3000);
+        } else {
+          btn.textContent = '🦊 Add to MetaMask';
+          btn.disabled = false;
+        }
+      });
+    });
     
   } catch (error) {
     console.error('Error loading tokens:', error);
