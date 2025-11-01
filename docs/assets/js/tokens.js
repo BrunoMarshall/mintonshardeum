@@ -5,12 +5,14 @@ const NETWORKS = {
   TESTNET: {
     chainId: '0x1FB7',
     chainIdNumber: 8119,
+    chainName: 'Shardeum EVM Testnet',
     factoryAddress: '0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4',
     explorerUrl: 'https://explorer-mezame.shardeum.org'
   },
   MAINNET: {
     chainId: '0x1FB6',
     chainIdNumber: 8118,
+    chainName: 'Shardeum',
     factoryAddress: '0x294665ec45ab8668d922474f63a03e33416d8deb',
     explorerUrl: 'https://explorer.shardeum.org'
   }
@@ -311,41 +313,58 @@ async function updateConnectionStatus() {
 
   try {
     const accounts = await web3.eth.getAccounts();
-    const chainId = Number(await web3.eth.getChainId());
-    const config = NETWORKS[currentNetwork];
-    const expectedChainId = config.chainIdNumber;
     
-    // Update network toggle based on actual chain
-    if (networkToggle && chainId === NETWORKS.TESTNET.chainIdNumber) {
-      networkToggle.checked = true;
-      currentNetwork = 'TESTNET';
-      updateNetworkIndicator();
-    } else if (networkToggle && chainId === NETWORKS.MAINNET.chainIdNumber) {
-      networkToggle.checked = false;
-      currentNetwork = 'MAINNET';
-      updateNetworkIndicator();
-    }
-    
-    if (accounts.length > 0) {
-      const account = accounts[0];
-      const shortAccount = `${account.slice(0, 6)}...${account.slice(-4)}`;
-      
-      const networkName = chainId === expectedChainId ? config.chainName : `Wrong Network (Chain ID: ${chainId})`;
-      
-      connectionStatus.textContent = `${networkName} | ${shortAccount}`;
-      connectionStatus.style.display = "inline";
-      disconnectButton.style.display = "inline-block";
-      connectButton.style.display = "none";
-    } else {
+    if (accounts.length === 0) {
+      // Not connected
       connectionStatus.textContent = "";
       connectionStatus.style.display = "none";
       disconnectButton.style.display = "none";
       connectButton.style.display = "inline-block";
       connectButton.textContent = "Connect MetaMask";
       connectButton.disabled = false;
+      return;
     }
+    
+    const chainId = Number(await web3.eth.getChainId());
+    
+    // Update network toggle based on actual chain
+    if (networkToggle) {
+      if (chainId === NETWORKS.TESTNET.chainIdNumber) {
+        networkToggle.checked = true;
+        currentNetwork = 'TESTNET';
+      } else if (chainId === NETWORKS.MAINNET.chainIdNumber) {
+        networkToggle.checked = false;
+        currentNetwork = 'MAINNET';
+      }
+      updateNetworkIndicator();
+    }
+    
+    const config = NETWORKS[currentNetwork];
+    const expectedChainId = config.chainIdNumber;
+    const account = accounts[0];
+    const shortAccount = `${account.slice(0, 6)}...${account.slice(-4)}`;
+    
+    // Determine network name
+    let networkName;
+    if (chainId === expectedChainId) {
+      networkName = config.chainName;
+    } else {
+      networkName = `Wrong Network (Chain ID: ${chainId})`;
+    }
+    
+    connectionStatus.textContent = `${networkName} | ${shortAccount}`;
+    connectionStatus.style.display = "inline";
+    disconnectButton.style.display = "inline-block";
+    connectButton.style.display = "none";
+    
   } catch (error) {
     console.error("Error updating connection status:", error);
+    connectionStatus.textContent = "";
+    connectionStatus.style.display = "none";
+    disconnectButton.style.display = "none";
+    connectButton.style.display = "inline-block";
+    connectButton.textContent = "Connect MetaMask";
+    connectButton.disabled = false;
   }
 }
 
