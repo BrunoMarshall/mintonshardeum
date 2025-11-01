@@ -1,9 +1,18 @@
-// Use existing web3 instance from app.js if available
+// Token submission script - uses web3 from app.js
 (function() {
   'use strict';
   
-  // Get web3 from global scope or create new instance
-  const web3Instance = window.web3 || new Web3(window.ethereum);
+  // Get or create web3 instance
+  let web3Instance;
+  if (typeof web3 !== 'undefined') {
+    // Use existing web3 from app.js
+    web3Instance = web3;
+  } else if (typeof window.ethereum !== 'undefined') {
+    // Create new instance if needed
+    web3Instance = new Web3(window.ethereum);
+  } else {
+    console.error('No web3 provider found');
+  }
 
   // Network configurations
   const NETWORKS = {
@@ -71,6 +80,9 @@
   // Get current network config
   async function getCurrentNetworkConfig() {
     try {
+      if (!web3Instance) {
+        return NETWORKS.MAINNET;
+      }
       const chainId = Number(await web3Instance.eth.getChainId());
       if (chainId === NETWORKS.TESTNET.chainIdNumber) {
         currentNetwork = 'TESTNET';
@@ -116,6 +128,11 @@
     
     if (!window.ethereum) {
       autoTokenInfo.innerHTML = '<p class="error-text">❌ MetaMask not detected. Please install MetaMask.</p>';
+      return;
+    }
+    
+    if (!web3Instance) {
+      autoTokenInfo.innerHTML = '<p class="error-text">❌ Web3 not initialized. Please refresh the page.</p>';
       return;
     }
     
@@ -317,6 +334,11 @@
         return;
       }
       
+      if (!web3Instance) {
+        alert('Web3 not initialized. Please refresh the page.');
+        return;
+      }
+      
       manualVerifyBtn.textContent = '⏳ Verifying...';
       manualVerifyBtn.disabled = true;
       
@@ -474,34 +496,54 @@
     });
   }
 
-  // Initialize on load
-  window.addEventListener('load', async () => {
-    updateNetworkIndicator();
-    
-    if (window.ethereum) {
-      const chainId = Number(await web3Instance.eth.getChainId());
-      
-      if (chainId === NETWORKS.MAINNET.chainIdNumber) {
-        currentNetwork = 'MAINNET';
-        if (networkToggle) networkToggle.checked = false;
-      } else if (chainId === NETWORKS.TESTNET.chainIdNumber) {
-        currentNetwork = 'TESTNET';
-        if (networkToggle) networkToggle.checked = true;
+  // Initialize on load - wait for web3 to be available
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAfterDelay);
+  } else {
+    initializeAfterDelay();
+  }
+
+  function initializeAfterDelay() {
+    // Wait a bit for app.js to load web3
+    setTimeout(async () => {
+      // Try to get web3 from global scope
+      if (typeof web3 !== 'undefined') {
+        web3Instance = web3;
+      } else if (typeof window.ethereum !== 'undefined') {
+        web3Instance = new Web3(window.ethereum);
       }
       
       updateNetworkIndicator();
-      loadUserTokens();
       
-      window.ethereum.on('accountsChanged', () => {
-        if (autoMode && autoMode.classList.contains('active')) {
+      if (window.ethereum && web3Instance) {
+        try {
+          const chainId = Number(await web3Instance.eth.getChainId());
+          
+          if (chainId === NETWORKS.MAINNET.chainIdNumber) {
+            currentNetwork = 'MAINNET';
+            if (networkToggle) networkToggle.checked = false;
+          } else if (chainId === NETWORKS.TESTNET.chainIdNumber) {
+            currentNetwork = 'TESTNET';
+            if (networkToggle) networkToggle.checked = true;
+          }
+          
+          updateNetworkIndicator();
           loadUserTokens();
+          
+          window.ethereum.on('accountsChanged', () => {
+            if (autoMode && autoMode.classList.contains('active')) {
+              loadUserTokens();
+            }
+          });
+          
+          window.ethereum.on('chainChanged', () => {
+            window.location.reload();
+          });
+        } catch (error) {
+          console.error('Error initializing:', error);
         }
-      });
-      
-      window.ethereum.on('chainChanged', () => {
-        window.location.reload();
-      });
-    }
-  });
+      }
+    }, 500); // Wait 500ms for app.js to load
+  }
 
 })();
