@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit Token to DEX - MintonShardeum</title>
+    <title>Submit Token - MintonShardeum</title>
     <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/network-styles.css">
     <link rel="icon" href="assets/images/mintonshardeum_favicon.png">
 </head>
-<body>
+<body class="mainnet-mode">
     <header>
         <div class="header-title">Mint On Shardeum</div>
         <nav>
@@ -18,6 +19,16 @@
             <a href="https://mintondex.com/" target="_blank" class="dex-link">
                 <span class="dex-icon">🔄</span> Trade on MintonDEX
             </a>
+            <div class="header-theme-toggle">
+                <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle dark/light mode">☀️</button>
+            </div>
+            <div class="header-network-toggle">
+                <div id="network-indicator" class="network-indicator mainnet">🟢 MAINNET</div>
+                <label class="network-switch">
+                    <input type="checkbox" id="network-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
             <div id="wallet-info" class="wallet-info">
                 <button id="connect-metamask">Connect MetaMask</button>
                 <span id="connection-status" style="display: none;"></span>
@@ -25,185 +36,41 @@
             </div>
         </nav>
     </header>
-    
     <main>
         <section class="logo-section">
             <img src="assets/images/mintonshardeum_logo.png" alt="MintonShardeum Logo" class="main-logo">
         </section>
-        
-        <section class="minter">
-            <h1>🚀 List Your Token on MintonDEX</h1>
-            <p>Simple 3-step process via GitHub (takes ~5 minutes)</p>
-            
-            <!-- Clear Expectations Banner -->
-            <div class="expectations-banner">
-                <h3>📋 What You'll Need to Do:</h3>
-                <div class="expectation-steps">
-                    <div class="expect-step">
-                        <span class="expect-icon">1️⃣</span>
-                        <span>Prepare your logo (we'll help validate it)</span>
+        <section class="submit-section">
+            <h1>List Your Token on MintonDEX</h1>
+            <p>Submit your token to be listed on MintonDEX for trading</p>
+            <div class="submit-form-container">
+                <form id="submit-token-form">
+                    <div class="form-group">
+                        <label for="token-address">Token Contract Address:</label>
+                        <input type="text" id="token-address" required placeholder="0x...">
                     </div>
-                    <div class="expect-step">
-                        <span class="expect-icon">2️⃣</span>
-                        <span>Upload logo to our GitHub (via web interface)</span>
+                    <div class="form-group">
+                        <label for="token-name">Token Name:</label>
+                        <input type="text" id="token-name" required placeholder="My Token">
                     </div>
-                    <div class="expect-step">
-                        <span class="expect-icon">3️⃣</span>
-                        <span>Add your token info to our list (copy-paste JSON)</span>
+                    <div class="form-group">
+                        <label for="token-symbol">Token Symbol:</label>
+                        <input type="text" id="token-symbol" required placeholder="MTK">
                     </div>
-                </div>
-                <p class="expect-note">💡 <strong>Why GitHub?</strong> It keeps our token list open, transparent, and secure. You'll create a "Pull Request" - don't worry, we'll guide you!</p>
-            </div>
-            
-            <!-- Mode Selection -->
-            <div class="mode-selector">
-                <button class="mode-btn active" data-mode="auto">
-                    <span class="mode-icon">⚡</span>
-                    <span class="mode-title">Quick Submit</span>
-                    <span class="mode-desc">Auto-detect your minted tokens</span>
-                </button>
-                <button class="mode-btn" data-mode="manual">
-                    <span class="mode-icon">✍️</span>
-                    <span class="mode-title">Manual Submit</span>
-                    <span class="mode-desc">Enter any token address</span>
-                </button>
-            </div>
-            
-            <!-- AUTO MODE -->
-            <div id="auto-mode" class="submission-mode active">
-                <div id="auto-token-info" class="token-info-display">
-                    <p class="loading-text">🔍 Connect your wallet to detect your tokens...</p>
-                </div>
-                
-                <div id="auto-form" style="display: none;">
-                    <div class="form-section">
-                        <h2>✅ Token Detected</h2>
-                        
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <label>Token Name:</label>
-                                <span id="auto-name" class="info-value">-</span>
-                            </div>
-                            <div class="info-item">
-                                <label>Symbol:</label>
-                                <span id="auto-symbol" class="info-value">-</span>
-                            </div>
-                            <div class="info-item">
-                                <label>Contract:</label>
-                                <span id="auto-address" class="info-value">-</span>
-                            </div>
-                            <div class="info-item">
-                                <label>Decimals:</label>
-                                <span id="auto-decimals" class="info-value">-</span>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label for="project-website">Project Website:</label>
+                        <input type="url" id="project-website" placeholder="https://yourproject.com">
                     </div>
-                    
-                    <div class="form-section">
-                        <h2>📷 Step 1: Validate Your Logo</h2>
-                        <p class="step-description">Upload your logo here to validate it meets requirements. You'll upload it to GitHub in the next step.</p>
-                        
-                        <div class="logo-upload-area">
-                            <input type="file" id="auto-logo-file" accept=".png" style="display: none;">
-                            <div class="upload-box" onclick="document.getElementById('auto-logo-file').click()">
-                                <div id="auto-logo-preview" class="logo-preview-small">
-                                    <span class="upload-placeholder">
-                                        📷<br>Click to upload<br>256x256 PNG
-                                    </span>
-                                </div>
-                            </div>
-                            <div id="auto-logo-validation" class="validation-message"></div>
-                        </div>
-                        
-                        <div class="requirements-box">
-                            <strong>Requirements:</strong>
-                            <ul>
-                                <li>✅ Exactly 256x256 pixels</li>
-                                <li>✅ PNG format</li>
-                                <li>✅ Under 200KB</li>
-                                <li>✅ Transparent background (recommended)</li>
-                            </ul>
-                        </div>
-                        
-                        <button id="auto-submit-btn" class="btn-primary" disabled>
-                            Continue to GitHub Instructions →
-                        </button>
+                    <div class="form-group">
+                        <label for="project-description">Project Description:</label>
+                        <textarea id="project-description" rows="4" placeholder="Describe your project..."></textarea>
                     </div>
-                </div>
-            </div>
-            
-            <!-- MANUAL MODE -->
-            <div id="manual-mode" class="submission-mode">
-                <form id="manual-form">
-                    <div class="form-section">
-                        <h2>Token Information</h2>
-                        
-                        <div class="form-group">
-                            <label for="manual-address">Token Contract Address *</label>
-                            <input type="text" id="manual-address" required 
-                                   placeholder="0x..." pattern="^0x[a-fA-F0-9]{40}$">
-                            <small>Shardeum EVM Testnet (Chain ID: 8119)</small>
-                        </div>
-                        
-                        <button type="button" id="manual-verify-btn" class="btn-secondary">
-                            🔍 Verify Contract
-                        </button>
-                        
-                        <div id="manual-token-info" style="display: none;">
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <label>Token Name:</label>
-                                    <span id="manual-name" class="info-value">-</span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Symbol:</label>
-                                    <span id="manual-symbol" class="info-value">-</span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Decimals:</label>
-                                    <span id="manual-decimals" class="info-value">-</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="manual-logo-section" class="form-section" style="display: none;">
-                        <h2>📷 Step 1: Validate Your Logo</h2>
-                        <p class="step-description">Upload your logo here to validate it meets requirements.</p>
-                        
-                        <div class="logo-upload-area">
-                            <input type="file" id="manual-logo-file" accept=".png" style="display: none;">
-                            <div class="upload-box" onclick="document.getElementById('manual-logo-file').click()">
-                                <div id="manual-logo-preview" class="logo-preview-small">
-                                    <span class="upload-placeholder">
-                                        📷<br>Click to upload<br>256x256 PNG
-                                    </span>
-                                </div>
-                            </div>
-                            <div id="manual-logo-validation" class="validation-message"></div>
-                        </div>
-                        
-                        <div class="requirements-box">
-                            <strong>Requirements:</strong>
-                            <ul>
-                                <li>✅ Exactly 256x256 pixels</li>
-                                <li>✅ PNG format</li>
-                                <li>✅ Under 200KB</li>
-                            </ul>
-                        </div>
-                        
-                        <button type="submit" id="manual-submit-btn" class="btn-primary" disabled>
-                            Continue to GitHub Instructions →
-                        </button>
-                    </div>
+                    <button type="submit">Submit for Listing</button>
                 </form>
+                <p id="submit-status"></p>
             </div>
-            
-            <!-- Results Section -->
-            <div id="submission-result" style="display: none;"></div>
         </section>
     </main>
-    
     <footer>
         <div class="social-links">
             <a href="https://discord.com/invite/shardeum"><img src="assets/images/discord.svg" alt="Discord"></a>
@@ -215,9 +82,7 @@
         </div>
         <img src="assets/images/Shardeum_logo_white.png" alt="Shardeum Logo" class="shardeum-logo">
     </footer>
-    
     <script src="assets/js/web3.min.js"></script>
-    <script src="assets/js/app.js"></script>
     <script src="assets/js/token-submission-simple.js"></script>
 </body>
 </html>

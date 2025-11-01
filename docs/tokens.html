@@ -5,26 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Created Tokens - MintonShardeum</title>
     <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/network-styles.css">
     <link rel="icon" href="assets/images/mintonshardeum_favicon.png">
 </head>
-<body>
+<body class="mainnet-mode">
     <header>
-    <div class="header-title">Mint On Shardeum</div>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="tokens.html">Tokens</a>
-        <a href="about.html">About</a>
-        <a href="submit-token.html">List token on MintonDEX</a>
-        <a href="https://mintondex.com/" target="_blank" class="dex-link">
-            <span class="dex-icon">🔄</span> Trade on MintonDEX
-        </a>
-        <div id="wallet-info" class="wallet-info">
-            <button id="connect-metamask">Connect MetaMask</button>
-            <span id="connection-status" style="display: none;"></span>
-            <button id="disconnect-metamask" style="display: none;">Disconnect</button>
-        </div>
-    </nav>
-</header>
+        <div class="header-title">Mint On Shardeum</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="tokens.html">Tokens</a>
+            <a href="about.html">About</a>
+            <a href="submit-token.html">List token on MintonDEX</a>
+            <a href="https://mintondex.com/" target="_blank" class="dex-link">
+                <span class="dex-icon">🔄</span> Trade on MintonDEX
+            </a>
+            <div class="header-theme-toggle">
+                <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle dark/light mode">☀️</button>
+            </div>
+            <div class="header-network-toggle">
+                <div id="network-indicator" class="network-indicator mainnet">🟢 MAINNET</div>
+                <label class="network-switch">
+                    <input type="checkbox" id="network-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div id="wallet-info" class="wallet-info">
+                <button id="connect-metamask">Connect MetaMask</button>
+                <span id="connection-status" style="display: none;"></span>
+                <button id="disconnect-metamask" style="display: none;">Disconnect</button>
+            </div>
+        </nav>
+    </header>
     <main>
         <section class="logo-section">
             <img src="assets/images/mintonshardeum_logo.png" alt="MintonShardeum Logo" class="main-logo">
@@ -32,7 +43,6 @@
         <section class="tokens-section">
             <h1>Tokens Created on Minton</h1>
             <p>All tokens deployed through the MintonShardeum platform</p>
-            
             <div class="stats-bar">
                 <div class="stat-item">
                     <span class="stat-label">Total Tokens:</span>

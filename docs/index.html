@@ -9,40 +9,40 @@
     <link rel="icon" href="assets/images/mintonshardeum_favicon.png">
 </head>
 <body class="mainnet-mode">
-    
-    <!-- Network Toggle Switch -->
-    <div class="network-toggle-container">
-        <div id="network-indicator" class="network-indicator mainnet">🟢 MAINNET</div>
-        <label class="network-switch">
-            <input type="checkbox" id="network-toggle">
-            <span class="slider"></span>
-        </label>
-    </div>
-
-    <!-- Dark/Light Mode Toggle -->
-    <div class="theme-toggle-container">
-        <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle dark/light mode">
-            ☀️
-        </button>
-    </div>
-
     <header>
-    <div class="header-title">Mint On Shardeum</div>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="tokens.html">Tokens</a>
-        <a href="about.html">About</a>
-        <a href="submit-token.html">List token on MintonDEX</a>
-        <a href="https://mintondex.com/" target="_blank" class="dex-link">
-            <span class="dex-icon">🔄</span> Trade on MintonDEX
-        </a>
-        <div id="wallet-info" class="wallet-info">
-            <button id="connect-metamask">Connect MetaMask</button>
-            <span id="connection-status" style="display: none;"></span>
-            <button id="disconnect-metamask" style="display: none;">Disconnect</button>
-        </div>
-    </nav>
-</header>
+        <div class="header-title">Mint On Shardeum</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="tokens.html">Tokens</a>
+            <a href="about.html">About</a>
+            <a href="submit-token.html">List token on MintonDEX</a>
+            <a href="https://mintondex.com/" target="_blank" class="dex-link">
+                <span class="dex-icon">🔄</span> Trade on MintonDEX
+            </a>
+            
+            <!-- Theme Toggle -->
+            <div class="header-theme-toggle">
+                <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle dark/light mode">☀️</button>
+            </div>
+            
+            <!-- Network Toggle -->
+            <div class="header-network-toggle">
+                <div id="network-indicator" class="network-indicator mainnet">🟢 MAINNET</div>
+                <label class="network-switch">
+                    <input type="checkbox" id="network-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <!-- Wallet -->
+            <div id="wallet-info" class="wallet-info">
+                <button id="connect-metamask">Connect MetaMask</button>
+                <span id="connection-status" style="display: none;"></span>
+                <button id="disconnect-metamask" style="display: none;">Disconnect</button>
+            </div>
+        </nav>
+    </header>
+    
     <main>
         <section class="logo-section">
             <img src="assets/images/mintonshardeum_logo.png" alt="MintonShardeum Logo" class="main-logo">
@@ -79,6 +79,7 @@
             <p id="status"></p>
         </section>
     </main>
+    
     <footer>
         <div class="social-links">
             <a href="https://discord.com/invite/shardeum"><img src="assets/images/discord.svg" alt="Discord"></a>
@@ -90,6 +91,7 @@
         </div>
         <img src="assets/images/Shardeum_logo_white.png" alt="Shardeum Logo" class="shardeum-logo">
     </footer>
+    
     <script src="assets/js/web3.min.js"></script>
     <script src="assets/js/app.js"></script>
 </body>
