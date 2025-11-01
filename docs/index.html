@@ -1,78 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MintonShardeum - Token Minter</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="icon" href="assets/images/mintonshardeum_favicon.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minton - Deploy Your Token on Shardeum</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/network-styles.css">
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
 </head>
-<body>
-    <header>
-    <div class="header-title">Mint On Shardeum</div>
+<body class="testnet-mode">
+  
+  <!-- Network Toggle Switch -->
+  <div class="network-toggle-container">
+    <div id="network-indicator" class="network-indicator testnet">🔧 TESTNET MODE</div>
+    <label class="network-switch">
+      <input type="checkbox" id="network-toggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <header>
     <nav>
-        <a href="index.html">Home</a>
-        <a href="tokens.html">Tokens</a>
-        <a href="about.html">About</a>
-        <a href="submit-token.html">List token on MintonDEX</a>
-        <a href="https://mintondex.com/" target="_blank" class="dex-link">
-            <span class="dex-icon">🔄</span> Trade on MintonDEX
-        </a>
-        <div id="wallet-info" class="wallet-info">
-            <button id="connect-metamask">Connect MetaMask</button>
-            <span id="connection-status" style="display: none;"></span>
-            <button id="disconnect-metamask" style="display: none;">Disconnect</button>
-        </div>
+      <div class="logo">
+        <img src="assets/images/logo.png" alt="Minton Logo">
+        <h1>Minton</h1>
+      </div>
+      <ul>
+        <li><a href="index.html" class="active">Deploy Token</a></li>
+        <li><a href="tokens.html">Browse Tokens</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+      <div class="wallet-section">
+        <button id="connect-metamask" class="btn-primary">Connect MetaMask</button>
+        <button id="disconnect-metamask" class="btn-secondary" style="display: none;">Disconnect</button>
+        <span id="connection-status"></span>
+      </div>
     </nav>
-</header>
-    <main>
-        <section class="logo-section">
-            <img src="assets/images/mintonshardeum_logo.png" alt="MintonShardeum Logo" class="main-logo">
-        </section>
-        <section class="minter">
-            <h1>Minton's Token Forge</h1>
-            <p>Create your own tokens on the Shardeum blockchain!</p>
-            <form id="token-form">
-                <div class="form-group">
-                    <label for="token-name">Token Name:</label>
-                    <input type="text" id="token-name" required pattern="[A-Za-z0-9\s]+" maxlength="50" placeholder="MINTON">
-                </div>
-                <div class="form-group">
-                    <label for="token-symbol">Token Symbol:</label>
-                    <input type="text" id="token-symbol" required pattern="[A-Za-z0-9]+" maxlength="10" placeholder="MINT">
-                </div>
-                <div class="form-group">
-                    <label for="initial-supply">Initial Supply:</label>
-                    <input type="number" id="initial-supply" required min="1" step="1" placeholder="10000000">
-                </div>
-                <div class="form-group">
-                    <label for="max-supply">Max Supply:</label>
-                    <input type="number" id="max-supply" required min="1" step="1" placeholder="10000000">
-                </div>
-                <div class="form-group checkbox-group">
-                    <label for="mintable">
-                        <input type="checkbox" id="mintable">
-                        <span class="checkbox-label-text">Mintable</span>
-                    </label>
-                    <small class="checkbox-description">Allow minting more tokens later (up to max supply)</small>
-                </div>
-                <button type="submit">Mint Token</button>
-            </form>
-            <p id="status"></p>
-        </section>
-    </main>
-    <footer>
-        <div class="social-links">
-            <a href="https://discord.com/invite/shardeum"><img src="assets/images/discord.svg" alt="Discord"></a>
-            <a href="https://github.com/BrunoMarshall/mintonshardeum"><img src="assets/images/github.svg" alt="GitHub"></a>
-            <a href="https://www.linkedin.com/company/shardeum"><img src="assets/images/linkedin.svg" alt="LinkedIn"></a>
-            <a href="https://t.me/shardeum"><img src="assets/images/telegram.svg" alt="Telegram"></a>
-            <a href="https://twitter.com/shardeum"><img src="assets/images/twitter.svg" alt="Twitter"></a>
-            <a href="https://www.youtube.com/@shardeum"><img src="assets/images/youtube.svg" alt="YouTube"></a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h2>Deploy Your Custom ERC-20 Token</h2>
+      <p>Create your own token on Shardeum Network in minutes</p>
+      <p class="network-info">Switch between Testnet and Mainnet using the toggle above</p>
+    </section>
+
+    <section class="deploy-section">
+      <div class="form-container">
+        <h3>Token Details</h3>
+        <form id="token-form">
+          <div class="form-group">
+            <label for="token-name">Token Name *</label>
+            <input type="text" id="token-name" placeholder="e.g., My Awesome Token" maxlength="50" required>
+            <small>Maximum 50 characters</small>
+          </div>
+
+          <div class="form-group">
+            <label for="token-symbol">Token Symbol *</label>
+            <input type="text" id="token-symbol" placeholder="e.g., MAT" maxlength="10" required>
+            <small>Maximum 10 characters</small>
+          </div>
+
+          <div class="form-group">
+            <label for="initial-supply">Initial Supply *</label>
+            <input type="number" id="initial-supply" placeholder="e.g., 1000000" step="any" min="0" required>
+            <small>Number of tokens to mint initially</small>
+          </div>
+
+          <div class="form-group">
+            <label for="max-supply">Maximum Supply *</label>
+            <input type="number" id="max-supply" placeholder="e.g., 10000000" step="any" min="0" required>
+            <small>Total supply cap for your token</small>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" id="mintable">
+              <span>Allow minting additional tokens later</span>
+            </label>
+            <small>You can mint more tokens up to the max supply if enabled</small>
+          </div>
+
+          <div class="fee-info">
+            <p><strong>Deployment Fee:</strong> 5,000 SHM</p>
+            <p class="fee-note">Plus network gas fees</p>
+          </div>
+
+          <button type="submit" class="btn-primary btn-large">Deploy Token</button>
+        </form>
+
+        <div id="status" class="status-message"></div>
+      </div>
+
+      <div class="info-container">
+        <h3>Why Minton?</h3>
+        <ul class="features-list">
+          <li>✅ <strong>ERC-20 Standard:</strong> Fully compliant with industry standards</li>
+          <li>✅ <strong>Secure:</strong> Audited smart contracts with OpenZeppelin</li>
+          <li>✅ <strong>Customizable:</strong> Set your own supply and minting rules</li>
+          <li>✅ <strong>Owner Control:</strong> You own and control your token</li>
+          <li>✅ <strong>Fast Deployment:</strong> Deploy in under 2 minutes</li>
+          <li>✅ <strong>Low Fees:</strong> Benefit from Shardeum's low gas costs</li>
+          <li>🔧 <strong>Test First:</strong> Try on Testnet before Mainnet</li>
+          <li>🚀 <strong>Go Live:</strong> Deploy on Mainnet when ready</li>
+        </ul>
+
+        <div class="network-comparison">
+          <h4>Network Comparison</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Testnet</th>
+                <th>Mainnet</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Purpose</td>
+                <td>Testing & Development</td>
+                <td>Production</td>
+              </tr>
+              <tr>
+                <td>SHM Value</td>
+                <td>Free (No Value)</td>
+                <td>Real Value</td>
+              </tr>
+              <tr>
+                <td>Risk</td>
+                <td>Zero Risk</td>
+                <td>Real Assets</td>
+              </tr>
+              <tr>
+                <td>Use Case</td>
+                <td>Experiment & Learn</td>
+                <td>Live Projects</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <img src="assets/images/Shardeum_logo_white.png" alt="Shardeum Logo" class="shardeum-logo">
-    </footer>
-    <script src="assets/js/web3.min.js"></script>
-    <script src="assets/js/app.js"></script>
+      </div>
+    </section>
+
+    <section class="how-it-works">
+      <h3>How It Works</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h4>Choose Network</h4>
+          <p>Toggle between Testnet (for testing) or Mainnet (for production)</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h4>Connect Wallet</h4>
+          <p>Connect your MetaMask wallet to the selected network</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h4>Configure Token</h4>
+          <p>Enter your token details and supply parameters</p>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <h4>Deploy</h4>
+          <p>Pay 5,000 SHM and confirm the transaction</p>
+        </div>
+        <div class="step">
+          <div class="step-number">5</div>
+          <h4>Done!</h4>
+          <p>Your token is live and you're the owner</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Minton. Deploy tokens on Shardeum Network.</p>
+    <div class="social-links">
+      <a href="https://github.com/BrunoMarshall/mintonshardeum" target="_blank">GitHub</a>
+      <a href="https://shardeum.org" target="_blank">Shardeum</a>
+    </div>
+  </footer>
+
+  <script src="assets/js/web3_min.js"></script>
+  <script src="assets/js/app.js"></script>
 </body>
 </html>
