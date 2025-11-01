@@ -295,12 +295,102 @@ if (refreshBtn) {
   });
 }
 
+// ========================================
+// WALLET CONNECTION LOGIC FOR TOKENS PAGE
+// ========================================
+
+const connectButton = document.getElementById("connect-metamask");
+const disconnectButton = document.getElementById("disconnect-metamask");
+const connectionStatus = document.getElementById("connection-status");
+
+// Function to update connection status display
+async function updateConnectionStatus() {
+  if (!connectButton || !disconnectButton || !connectionStatus) {
+    return;
+  }
+
+  try {
+    const accounts = await web3.eth.getAccounts();
+    const chainId = Number(await web3.eth.getChainId());
+    const config = NETWORKS[currentNetwork];
+    const expectedChainId = config.chainIdNumber;
+    
+    // Update network toggle based on actual chain
+    if (networkToggle && chainId === NETWORKS.TESTNET.chainIdNumber) {
+      networkToggle.checked = true;
+      currentNetwork = 'TESTNET';
+      updateNetworkIndicator();
+    } else if (networkToggle && chainId === NETWORKS.MAINNET.chainIdNumber) {
+      networkToggle.checked = false;
+      currentNetwork = 'MAINNET';
+      updateNetworkIndicator();
+    }
+    
+    if (accounts.length > 0) {
+      const account = accounts[0];
+      const shortAccount = `${account.slice(0, 6)}...${account.slice(-4)}`;
+      
+      const networkName = chainId === expectedChainId ? config.chainName : `Wrong Network (Chain ID: ${chainId})`;
+      
+      connectionStatus.textContent = `${networkName} | ${shortAccount}`;
+      connectionStatus.style.display = "inline";
+      disconnectButton.style.display = "inline-block";
+      connectButton.style.display = "none";
+    } else {
+      connectionStatus.textContent = "";
+      connectionStatus.style.display = "none";
+      disconnectButton.style.display = "none";
+      connectButton.style.display = "inline-block";
+      connectButton.textContent = "Connect MetaMask";
+      connectButton.disabled = false;
+    }
+  } catch (error) {
+    console.error("Error updating connection status:", error);
+  }
+}
+
+// Connect to MetaMask
+if (connectButton) {
+  connectButton.addEventListener("click", async () => {
+    if (typeof window.ethereum === "undefined") {
+      alert("❌ MetaMask is not detected. Please install it.");
+      window.open("https://metamask.io/download/", "_blank");
+      return;
+    }
+    
+    try {
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      await updateConnectionStatus();
+    } catch (error) {
+      console.error("MetaMask Error:", error);
+      alert(`Connection failed: ${error.message}`);
+    }
+  });
+}
+
+// Disconnect button handler
+if (disconnectButton) {
+  disconnectButton.addEventListener("click", async () => {
+    connectionStatus.textContent = "";
+    connectionStatus.style.display = "none";
+    disconnectButton.style.display = "none";
+    connectButton.style.display = "inline-block";
+  });
+}
+
 // Load on page load
 window.addEventListener('load', async () => {
   updateNetworkIndicator();
   
   if (window.ethereum) {
+    // Check if already connected
+    await updateConnectionStatus();
     await loadTokens();
+    
+    // Listen for account changes
+    window.ethereum.on("accountsChanged", async () => {
+      await updateConnectionStatus();
+    });
     
     // Listen for network changes
     window.ethereum.on('chainChanged', () => {

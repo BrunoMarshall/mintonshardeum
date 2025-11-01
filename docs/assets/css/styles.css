@@ -1597,6 +1597,8 @@ body.mainnet-mode::before {
   align-items: center;
   gap: 10px;
   margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #e0e0e0;
 }
 
 /* Add to MetaMask Button - Matches network badge style */
@@ -1611,6 +1613,10 @@ body.mainnet-mode::before {
   white-space: nowrap;
   flex: 1;
   color: white;
+  line-height: 1.5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .add-to-metamask-btn.testnet {
@@ -1636,4 +1642,27 @@ body.mainnet-mode::before {
 
 .add-to-metamask-btn:active {
   transform: translateY(0);
+}
+
+/* Network badge alignment */
+.network-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.network-badge.testnet {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.network-badge.mainnet {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
 }
