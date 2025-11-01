@@ -8,15 +8,22 @@
     <link rel="stylesheet" href="assets/css/network-styles.css">
     <link rel="icon" href="assets/images/mintonshardeum_favicon.png">
 </head>
-<body class="testnet-mode">
+<body class="mainnet-mode">
     
     <!-- Network Toggle Switch -->
     <div class="network-toggle-container">
-        <div id="network-indicator" class="network-indicator testnet">🔧 TESTNET MODE</div>
+        <div id="network-indicator" class="network-indicator mainnet">🟢 MAINNET</div>
         <label class="network-switch">
             <input type="checkbox" id="network-toggle">
             <span class="slider"></span>
         </label>
+    </div>
+
+    <!-- Dark/Light Mode Toggle -->
+    <div class="theme-toggle-container">
+        <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle dark/light mode">
+            ☀️
+        </button>
     </div>
 
     <header>

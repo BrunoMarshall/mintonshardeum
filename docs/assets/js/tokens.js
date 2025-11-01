@@ -1,5 +1,24 @@
 const web3 = new Web3(window.ethereum);
 
+// Network configurations
+const NETWORKS = {
+  TESTNET: {
+    chainId: '0x1FB7',
+    chainIdNumber: 8119,
+    factoryAddress: '0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4',
+    explorerUrl: 'https://explorer-mezame.shardeum.org'
+  },
+  MAINNET: {
+    chainId: '0x1FB6',
+    chainIdNumber: 8118,
+    factoryAddress: '0x294665ec45ab8668d922474f63a03e33416d8deb',
+    explorerUrl: 'https://explorer.shardeum.org'
+  }
+};
+
+// Current network (detect from chain)
+let currentNetwork = 'MAINNET';
+
 const factoryABI = [
   {
     "inputs": [],
@@ -55,345 +74,152 @@ const tokenABI = [
   },
   {
     "inputs": [],
-    "name": "decimals",
-    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   }
 ];
 
-const factoryAddress = "0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4";
-const factory = new web3.eth.Contract(factoryABI, factoryAddress);
-
-// Wallet connection elements
-const connectButton = document.getElementById("connect-metamask");
-const disconnectButton = document.getElementById("disconnect-metamask");
-const connectionStatus = document.getElementById("connection-status");
-
-// Shardeum network configuration
-const SHARDEUM_TESTNET = {
-  chainId: '0x1FB7',
-  chainName: 'Shardeum EVM Testnet',
-  nativeCurrency: {
-    name: 'Shardeum',
-    symbol: 'SHM',
-    decimals: 18
-  },
-  rpcUrls: ['https://api-mezame.shardeum.org/'],
-  blockExplorerUrls: ['https://explorer-mezame.shardeum.org/']
-};
-
-const networkNames = {
-  8119: "Shardeum EVM Testnet",
-  8080: "Shardeum Unstablenet (Deprecated)"
-};
-
-// Wallet connection functions
-async function addShardeumNetwork() {
+// Get current network config
+async function getCurrentNetworkConfig() {
   try {
-    await window.ethereum.request({
-      method: 'wallet_addEthereumChain',
-      params: [SHARDEUM_TESTNET]
-    });
-    return true;
-  } catch (error) {
-    console.error("Error adding network:", error);
-    return false;
-  }
-}
-
-async function switchToShardeumNetwork() {
-  try {
-    await window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: SHARDEUM_TESTNET.chainId }]
-    });
-    return true;
-  } catch (error) {
-    if (error.code === 4902) {
-      return await addShardeumNetwork();
-    }
-    console.error("Error switching network:", error);
-    return false;
-  }
-}
-
-async function updateConnectionStatus() {
-  try {
-    const accounts = await web3.eth.getAccounts();
     const chainId = Number(await web3.eth.getChainId());
-    const networkName = networkNames[chainId] || `Unknown Network (Chain ID: ${chainId})`;
-    
-    if (accounts.length > 0) {
-      const account = accounts[0];
-      const shortAccount = `${account.slice(0, 6)}...${account.slice(-4)}`;
-      connectionStatus.textContent = `${networkName} | ${shortAccount}`;
-      connectionStatus.style.display = "inline";
-      disconnectButton.style.display = "inline-block";
-      connectButton.style.display = "none";
-    } else {
-      connectionStatus.textContent = "";
-      connectionStatus.style.display = "none";
-      disconnectButton.style.display = "none";
-      connectButton.style.display = "inline-block";
+    if (chainId === NETWORKS.TESTNET.chainIdNumber) {
+      currentNetwork = 'TESTNET';
+      return NETWORKS.TESTNET;
+    } else if (chainId === NETWORKS.MAINNET.chainIdNumber) {
+      currentNetwork = 'MAINNET';
+      return NETWORKS.MAINNET;
     }
+    // Default to mainnet
+    return NETWORKS.MAINNET;
   } catch (error) {
-    console.error("Error updating connection status:", error);
-  }
-}
-
-// Connect button
-connectButton.addEventListener("click", async () => {
-  if (typeof window.ethereum === "undefined") {
-    alert("MetaMask is not detected. Please install it.");
-    window.open("https://metamask.io/download/", "_blank");
-    return;
-  }
-  
-  try {
-    await window.ethereum.request({ method: "eth_requestAccounts" });
-    const chainId = Number(await web3.eth.getChainId());
-    if (chainId !== 8119) {
-      await switchToShardeumNetwork();
-    }
-    await updateConnectionStatus();
-  } catch (error) {
-    console.error("MetaMask Error:", error);
-  }
-});
-
-// Disconnect button
-disconnectButton.addEventListener("click", async () => {
-  connectionStatus.textContent = "";
-  connectionStatus.style.display = "none";
-  disconnectButton.style.display = "none";
-  connectButton.style.display = "inline-block";
-});
-
-// Token display logic
-let allTokens = [];
-let filteredTokens = [];
-let currentPage = 1;
-const tokensPerPage = 12;
-
-async function getTokenDetails(tokenAddress) {
-  try {
-    const tokenContract = new web3.eth.Contract(tokenABI, tokenAddress);
-    
-    const [name, symbol, totalSupply, maxSupply, mintable, decimals] = await Promise.all([
-      tokenContract.methods.name().call(),
-      tokenContract.methods.symbol().call(),
-      tokenContract.methods.totalSupply().call(),
-      tokenContract.methods.maxSupply().call(),
-      tokenContract.methods.mintable().call(),
-      tokenContract.methods.decimals().call()
-    ]);
-
-    return {
-      address: tokenAddress,
-      name,
-      symbol,
-      totalSupply: web3.utils.fromWei(totalSupply, 'ether'),
-      maxSupply: web3.utils.fromWei(maxSupply, 'ether'),
-      mintable,
-      decimals
-    };
-  } catch (error) {
-    console.error(`Error fetching details for ${tokenAddress}:`, error);
-    return null;
+    console.error("Error detecting network:", error);
+    return NETWORKS.MAINNET;
   }
 }
 
 async function loadTokens() {
-  const container = document.getElementById('tokens-container');
-  const totalTokensEl = document.getElementById('total-tokens');
-  
   try {
-    container.innerHTML = '<div class="loading">Loading tokens...</div>';
-    
-    // Add a small delay before fetching
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const config = await getCurrentNetworkConfig();
+    const factory = new web3.eth.Contract(factoryABI, config.factoryAddress);
     
     const tokenAddresses = await factory.methods.getDeployedTokens().call();
     
-    if (tokenAddresses.length === 0) {
-      container.innerHTML = '<div class="no-tokens">No tokens have been created yet.</div>';
-      totalTokensEl.textContent = '0';
+    if (!tokenAddresses || tokenAddresses.length === 0) {
+      document.getElementById('token-grid').innerHTML = 
+        '<p style="text-align: center; color: #666;">No tokens deployed yet on ' + 
+        (currentNetwork === 'TESTNET' ? 'Testnet' : 'Mainnet') + '</p>';
       return;
     }
-
-    totalTokensEl.textContent = tokenAddresses.length;
     
-    // Fetch token details in smaller batches to avoid rate limiting
-    const batchSize = 3;
-    allTokens = [];
+    const tokenGrid = document.getElementById('token-grid');
+    tokenGrid.innerHTML = '';
     
-    const reversedAddresses = [...tokenAddresses].reverse();
-    
-    for (let i = 0; i < reversedAddresses.length; i += batchSize) {
-      const batch = reversedAddresses.slice(i, i + batchSize);
-      const batchPromises = batch.map(addr => getTokenDetails(addr));
-      const batchResults = await Promise.all(batchPromises);
-      allTokens.push(...batchResults.filter(token => token !== null));
-      
-      // Add delay between batches
-      if (i + batchSize < reversedAddresses.length) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+    for (const address of tokenAddresses) {
+      try {
+        const token = new web3.eth.Contract(tokenABI, address);
+        
+        const name = await token.methods.name().call();
+        const symbol = await token.methods.symbol().call();
+        const totalSupply = await token.methods.totalSupply().call();
+        const maxSupply = await token.methods.maxSupply().call();
+        const mintable = await token.methods.mintable().call();
+        
+        const tokenCard = document.createElement('div');
+        tokenCard.className = 'token-card';
+        tokenCard.innerHTML = `
+          <h3>${name} (${symbol})</h3>
+          <p><strong>Address:</strong> <a href="${config.explorerUrl}/address/${address}" target="_blank">${address.slice(0, 10)}...${address.slice(-8)}</a></p>
+          <p><strong>Supply:</strong> ${web3.utils.fromWei(totalSupply, 'ether')} / ${web3.utils.fromWei(maxSupply, 'ether')}</p>
+          <p><strong>Mintable:</strong> ${mintable ? 'Yes' : 'No'}</p>
+          <p class="network-badge ${currentNetwork === 'TESTNET' ? 'testnet' : 'mainnet'}">
+            ${currentNetwork === 'TESTNET' ? '🔧 Testnet' : '🟢 Mainnet'}
+          </p>
+        `;
+        
+        tokenGrid.appendChild(tokenCard);
+      } catch (tokenError) {
+        console.error(`Error loading token ${address}:`, tokenError);
       }
     }
-    
-    filteredTokens = [...allTokens];
-    displayTokens();
-    
   } catch (error) {
     console.error('Error loading tokens:', error);
+    document.getElementById('token-grid').innerHTML = 
+      '<p style="text-align: center; color: #FF6B6B;">Error loading tokens. Please make sure you\'re connected to the correct network.</p>';
+  }
+}
+
+// Network toggle handler
+const networkToggle = document.getElementById('network-toggle');
+const networkIndicator = document.getElementById('network-indicator');
+
+function updateNetworkIndicator() {
+  if (!networkIndicator) return;
+  
+  if (currentNetwork === 'TESTNET') {
+    networkIndicator.textContent = '🔧 TESTNET';
+    networkIndicator.className = 'network-indicator testnet';
+    document.body.classList.remove('mainnet-mode');
+    document.body.classList.add('testnet-mode');
+  } else {
+    networkIndicator.textContent = '🟢 MAINNET';
+    networkIndicator.className = 'network-indicator mainnet';
+    document.body.classList.remove('testnet-mode');
+    document.body.classList.add('mainnet-mode');
+  }
+}
+
+if (networkToggle) {
+  networkToggle.addEventListener('change', async (e) => {
+    currentNetwork = e.target.checked ? 'TESTNET' : 'MAINNET';
+    updateNetworkIndicator();
     
-    if (error.message && error.message.includes('circuit breaker')) {
-      container.innerHTML = '<div class="error">⚠️ Network is busy. Please wait a moment.<br><button onclick="window.loadTokens()" style="margin-top: 15px; padding: 10px 20px; background: #0024F1; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">Retry</button></div>';
-    } else {
-      container.innerHTML = '<div class="error">Failed to load tokens. Please refresh the page or try again later.</div>';
+    const config = NETWORKS[currentNetwork];
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: config.chainId }]
+      });
+      // Reload tokens after network switch
+      await loadTokens();
+    } catch (error) {
+      console.error("Error switching network:", error);
     }
-  }
-}
-
-function displayTokens() {
-  const container = document.getElementById('tokens-container');
-  const start = (currentPage - 1) * tokensPerPage;
-  const end = start + tokensPerPage;
-  const tokensToDisplay = filteredTokens.slice(start, end);
-  
-  if (tokensToDisplay.length === 0) {
-    container.innerHTML = '<div class="no-tokens">No tokens found.</div>';
-    return;
-  }
-  
-  container.innerHTML = tokensToDisplay.map(token => `
-    <div class="token-card">
-      <div class="token-header">
-        <h3>${token.name}</h3>
-        <span class="token-symbol">${token.symbol}</span>
-      </div>
-      <div class="token-details">
-        <div class="detail-row">
-          <span class="detail-label">Total Supply:</span>
-          <span class="detail-value">${formatNumber(token.totalSupply)}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Max Supply:</span>
-          <span class="detail-value">${formatNumber(token.maxSupply)}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Mintable:</span>
-          <span class="detail-value ${token.mintable ? 'mintable-yes' : 'mintable-no'}">
-            ${token.mintable ? 'Yes' : 'No'}
-          </span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Address:</span>
-          <span class="detail-value address-short">${token.address.slice(0, 6)}...${token.address.slice(-4)}</span>
-        </div>
-      </div>
-      <div class="token-actions">
-        <a href="https://explorer-mezame.shardeum.org/address/${token.address}" target="_blank" class="btn-view">
-          View on Explorer
-        </a>
-        <button class="btn-copy" onclick="copyAddress('${token.address}')">
-          Copy Address
-        </button>
-      </div>
-    </div>
-  `).join('');
-  
-  updatePagination();
-}
-
-function formatNumber(num) {
-  const number = parseFloat(num);
-  if (number >= 1000000) {
-    return (number / 1000000).toFixed(2) + 'M';
-  } else if (number >= 1000) {
-    return (number / 1000).toFixed(2) + 'K';
-  }
-  return number.toFixed(2);
-}
-
-function copyAddress(address) {
-  navigator.clipboard.writeText(address).then(() => {
-    alert('Address copied to clipboard!');
-  }).catch(err => {
-    console.error('Failed to copy:', err);
   });
 }
 
-function updatePagination() {
-  const pagination = document.getElementById('pagination');
-  const prevBtn = document.getElementById('prev-btn');
-  const nextBtn = document.getElementById('next-btn');
-  const pageInfo = document.getElementById('page-info');
-  
-  const totalPages = Math.ceil(filteredTokens.length / tokensPerPage);
-  
-  if (totalPages <= 1) {
-    pagination.style.display = 'none';
-    return;
+// Theme toggle
+const themeToggleBtn = document.getElementById('theme-toggle-btn');
+if (themeToggleBtn) {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    themeToggleBtn.textContent = '🌙';
   }
-  
-  pagination.style.display = 'flex';
-  pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-  
-  prevBtn.disabled = currentPage === 1;
-  nextBtn.disabled = currentPage === totalPages;
-}
 
-function filterTokens(searchTerm) {
-  const term = searchTerm.toLowerCase();
-  filteredTokens = allTokens.filter(token => 
-    token.name.toLowerCase().includes(term) ||
-    token.symbol.toLowerCase().includes(term) ||
-    token.address.toLowerCase().includes(term)
-  );
-  currentPage = 1;
-  displayTokens();
-}
-
-// Event listeners
-document.getElementById('search-input').addEventListener('input', (e) => {
-  filterTokens(e.target.value);
-});
-
-document.getElementById('refresh-btn').addEventListener('click', () => {
-  loadTokens();
-});
-
-document.getElementById('prev-btn').addEventListener('click', () => {
-  if (currentPage > 1) {
-    currentPage--;
-    displayTokens();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-});
-
-document.getElementById('next-btn').addEventListener('click', () => {
-  const totalPages = Math.ceil(filteredTokens.length / tokensPerPage);
-  if (currentPage < totalPages) {
-    currentPage++;
-    displayTokens();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-});
-
-// Make loadTokens accessible globally for retry button
-window.loadTokens = loadTokens;
-
-// Initialize
-window.addEventListener('load', () => {
-  loadTokens();
-  updateConnectionStatus();
-});
-
-if (window.ethereum) {
-  window.ethereum.on("accountsChanged", updateConnectionStatus);
-  window.ethereum.on("chainChanged", () => {
-    window.location.reload();
+  themeToggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    themeToggleBtn.textContent = isDark ? '🌙' : '☀️';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
   });
 }
+
+// Load on page load
+window.addEventListener('load', async () => {
+  updateNetworkIndicator();
+  
+  if (window.ethereum) {
+    await loadTokens();
+    
+    // Listen for network changes
+    window.ethereum.on('chainChanged', () => {
+      window.location.reload();
+    });
+  } else {
+    document.getElementById('token-grid').innerHTML = 
+      '<p style="text-align: center; color: #FF6B6B;">Please install MetaMask to view tokens.</p>';
+  }
+});

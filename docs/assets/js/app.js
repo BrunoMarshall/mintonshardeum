@@ -13,7 +13,7 @@ const NETWORKS = {
     },
     rpcUrls: ['https://api-mezame.shardeum.org/'],
     blockExplorerUrls: ['https://explorer-mezame.shardeum.org/'],
-    factoryAddress: '0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4', // testnet factory Address
+    factoryAddress: '0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4',
     explorerUrl: 'https://explorer-mezame.shardeum.org'
   },
   MAINNET: {
@@ -27,13 +27,13 @@ const NETWORKS = {
     },
     rpcUrls: ['https://api.shardeum.org/'],
     blockExplorerUrls: ['https://explorer.shardeum.org/'],
-    factoryAddress: '0x294665ec45ab8668d922474f63a03e33416d8deb', // MAINNET factoryAddress
+    factoryAddress: '0x294665ec45ab8668d922474f63a03e33416d8deb',
     explorerUrl: 'https://explorer.shardeum.org'
   }
 };
 
-// Current selected network (default to testnet)
-let currentNetwork = 'TESTNET';
+// Current selected network (default to mainnet)
+let currentNetwork = 'MAINNET';
 
 // Updated Factory ABI
 const factoryABI = [
@@ -97,23 +97,47 @@ const tokenForm = document.getElementById("token-form");
 const status = document.getElementById("status");
 const networkToggle = document.getElementById("network-toggle");
 const networkIndicator = document.getElementById("network-indicator");
+const themeToggleBtn = document.getElementById("theme-toggle-btn");
+
+// Theme toggle functionality
+if (themeToggleBtn) {
+  // Load saved theme
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    themeToggleBtn.textContent = '🌙';
+  }
+
+  themeToggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    themeToggleBtn.textContent = isDark ? '🌙' : '☀️';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  });
+}
 
 // Update network indicator styling
 function updateNetworkIndicator() {
   if (!networkIndicator) return;
   
   const config = NETWORKS[currentNetwork];
-  networkIndicator.textContent = currentNetwork === 'TESTNET' ? '🔧 TESTNET MODE' : '🚀 MAINNET MODE';
-  networkIndicator.className = currentNetwork === 'TESTNET' ? 'network-indicator testnet' : 'network-indicator mainnet';
-  
-  // Update background gradient based on network
-  document.body.className = currentNetwork === 'TESTNET' ? 'testnet-mode' : 'mainnet-mode';
+  if (currentNetwork === 'TESTNET') {
+    networkIndicator.textContent = '🔧 TESTNET';
+    networkIndicator.className = 'network-indicator testnet';
+    document.body.classList.remove('mainnet-mode');
+    document.body.classList.add('testnet-mode');
+  } else {
+    networkIndicator.textContent = '🟢 MAINNET';
+    networkIndicator.className = 'network-indicator mainnet';
+    document.body.classList.remove('testnet-mode');
+    document.body.classList.add('mainnet-mode');
+  }
 }
 
 // Network toggle handler
 if (networkToggle) {
   networkToggle.addEventListener('change', async (e) => {
-    currentNetwork = e.target.checked ? 'MAINNET' : 'TESTNET';
+    currentNetwork = e.target.checked ? 'TESTNET' : 'MAINNET';
     updateNetworkIndicator();
     
     // Try to switch MetaMask to the selected network
@@ -189,11 +213,11 @@ async function updateConnectionStatus() {
     
     // Update network toggle position based on actual chain
     if (networkToggle && chainId === NETWORKS.TESTNET.chainIdNumber) {
-      networkToggle.checked = false;
+      networkToggle.checked = true;
       currentNetwork = 'TESTNET';
       updateNetworkIndicator();
     } else if (networkToggle && chainId === NETWORKS.MAINNET.chainIdNumber) {
-      networkToggle.checked = true;
+      networkToggle.checked = false;
       currentNetwork = 'MAINNET';
       updateNetworkIndicator();
     }
@@ -215,7 +239,7 @@ async function updateConnectionStatus() {
           status.style.color = "#FF6B6B";
         } else {
           status.textContent = `✓ Connected to ${config.chainName}`;
-          status.style.color = currentNetwork === 'TESTNET' ? "#0024F1" : "#00C851";
+          status.style.color = currentNetwork === 'TESTNET' ? "#4a5568" : "#48bb78";
         }
       }
     } else {
@@ -278,7 +302,7 @@ if (connectButton) {
       await updateConnectionStatus();
       if (status) {
         status.textContent = "✓ Connected to MetaMask!";
-        status.style.color = currentNetwork === 'TESTNET' ? "#0024F1" : "#00C851";
+        status.style.color = currentNetwork === 'TESTNET' ? "#4a5568" : "#48bb78";
       }
     } catch (error) {
       const message = `❌ Connection failed: ${error.message}`;
@@ -400,9 +424,9 @@ if (tokenForm) {
       status.innerHTML = `✓ Token deployed successfully on ${config.chainName}!<br>
         <strong>Name:</strong> ${tokenName}<br>
         <strong>Symbol:</strong> ${tokenSymbol}<br>
-        <strong>Address:</strong> <a href="${config.explorerUrl}/address/${tokenAddress}" target="_blank" style="color: ${currentNetwork === 'TESTNET' ? '#0024F1' : '#00C851'};">${tokenAddress}</a><br>
-        <strong>Transaction:</strong> <a href="${config.explorerUrl}/tx/${tx.transactionHash}" target="_blank" style="color: ${currentNetwork === 'TESTNET' ? '#0024F1' : '#00C851'};">View on Explorer</a>`;
-      status.style.color = currentNetwork === 'TESTNET' ? "#0024F1" : "#00C851";
+        <strong>Address:</strong> <a href="${config.explorerUrl}/address/${tokenAddress}" target="_blank" style="color: ${currentNetwork === 'TESTNET' ? '#4a5568' : '#48bb78'};">${tokenAddress}</a><br>
+        <strong>Transaction:</strong> <a href="${config.explorerUrl}/tx/${tx.transactionHash}" target="_blank" style="color: ${currentNetwork === 'TESTNET' ? '#4a5568' : '#48bb78'};">View on Explorer</a>`;
+      status.style.color = currentNetwork === 'TESTNET' ? "#4a5568" : "#48bb78";
       
       tokenForm.reset();
       
@@ -436,11 +460,11 @@ window.addEventListener("load", async () => {
     // Auto-detect and set network based on current chain
     if (chainId === NETWORKS.MAINNET.chainIdNumber) {
       currentNetwork = 'MAINNET';
-      if (networkToggle) networkToggle.checked = true;
+      if (networkToggle) networkToggle.checked = false;
       updateNetworkIndicator();
     } else if (chainId === NETWORKS.TESTNET.chainIdNumber) {
       currentNetwork = 'TESTNET';
-      if (networkToggle) networkToggle.checked = false;
+      if (networkToggle) networkToggle.checked = true;
       updateNetworkIndicator();
     }
     
@@ -452,7 +476,7 @@ window.addEventListener("load", async () => {
         status.style.color = "#FFA500";
       } else {
         status.textContent = `Ready. Connect MetaMask to deploy tokens on ${config.chainName}.`;
-        status.style.color = currentNetwork === 'TESTNET' ? "#0024F1" : "#00C851";
+        status.style.color = currentNetwork === 'TESTNET' ? "#4a5568" : "#48bb78";
       }
     }
     
