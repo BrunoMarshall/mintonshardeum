@@ -1,590 +1,499 @@
-// Use web3 instance from app.js (already declared)
+const web3 = new Web3(window.ethereum);
 
-const FACTORY_ADDRESS = "0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4";
+// Network configurations
+const NETWORKS = {
+  TESTNET: {
+    chainId: '0x1FB7',
+    chainIdNumber: 8119,
+    chainName: 'Shardeum EVM Testnet',
+    factoryAddress: '0xaebf3ca591dec4f3bf738a6b993ffe048f359fd4',
+    explorerUrl: 'https://explorer-mezame.shardeum.org'
+  },
+  MAINNET: {
+    chainId: '0x1FB6',
+    chainIdNumber: 8118,
+    chainName: 'Shardeum',
+    factoryAddress: '0x294665ec45ab8668d922474f63a03e33416d8deb',
+    explorerUrl: 'https://explorer.shardeum.org'
+  }
+};
 
-const FACTORY_ABI = [
+let currentNetwork = 'MAINNET';
+
+// Factory ABI - Only what we need
+const factoryABI = [
   {
     "inputs": [],
     "name": "getDeployedTokens",
-    "outputs": [{"internalType": "address[]", "name": "", "type": "address[]"}],
+    "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
     "stateMutability": "view",
     "type": "function"
   }
 ];
 
-const ERC20_ABI = [
-  {"constant": true, "inputs": [], "name": "name", "outputs": [{"name": "", "type": "string"}], "type": "function"},
-  {"constant": true, "inputs": [], "name": "symbol", "outputs": [{"name": "", "type": "string"}], "type": "function"},
-  {"constant": true, "inputs": [], "name": "decimals", "outputs": [{"name": "", "type": "uint8"}], "type": "function"},
-  {"constant": true, "inputs": [{"name": "_owner", "type": "address"}], "name": "balanceOf", "outputs": [{"name": "balance", "type": "uint256"}], "type": "function"}
+// Token ABI
+const tokenABI = [
+  {
+    "inputs": [],
+    "name": "name",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "symbol",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
 ];
 
-let currentMode = 'auto';
-let tokenData = {};
-let logoFile = null;
-let logoDataUrl = null;
-
-console.log("🚀 Token submission script loaded");
-
-// Wait for wallet connection from app.js
-function checkWalletAndLoadTokens() {
-  web3.eth.getAccounts().then(accounts => {
-    if (accounts.length > 0 && currentMode === 'auto') {
-      console.log("✅ Wallet connected, loading tokens for:", accounts[0]);
-      loadUserTokens(accounts[0]);
-    } else if (accounts.length === 0 && currentMode === 'auto') {
-      console.log("⚠️ No wallet connected in auto mode");
-      const infoDiv = document.getElementById('auto-token-info');
-      if (infoDiv) {
-        infoDiv.innerHTML = `
-          <div class="info-banner">
-            <h3>🔗 Connect Your Wallet First</h3>
-            <p>Please connect your MetaMask wallet using the button above to auto-detect your tokens.</p>
-          </div>
-        `;
-      }
+// Get current network config
+async function getCurrentNetworkConfig() {
+  try {
+    const chainId = Number(await web3.eth.getChainId());
+    if (chainId === NETWORKS.TESTNET.chainIdNumber) {
+      currentNetwork = 'TESTNET';
+      return NETWORKS.TESTNET;
+    } else if (chainId === NETWORKS.MAINNET.chainIdNumber) {
+      currentNetwork = 'MAINNET';
+      return NETWORKS.MAINNET;
     }
-  }).catch(err => {
-    console.error("Error checking wallet:", err);
-  });
+    return NETWORKS.MAINNET;
+  } catch (error) {
+    console.error("Error detecting network:", error);
+    return NETWORKS.MAINNET;
+  }
 }
 
-// Listen for wallet connection events from app.js
-if (window.ethereum) {
-  window.ethereum.on("accountsChanged", (accounts) => {
-    console.log("👤 Account changed, reloading tokens...");
-    if (accounts.length > 0 && currentMode === 'auto') {
-      loadUserTokens(accounts[0]);
-    }
-  });
-}
-
-// Mode Switching
+// Mode switching
 const modeBtns = document.querySelectorAll('.mode-btn');
-if (modeBtns.length > 0) {
-  modeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      console.log("🔀 Switching to mode:", btn.dataset.mode);
-      currentMode = btn.dataset.mode;
-      
-      // Update button states
-      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      
-      // Update mode displays
-      document.querySelectorAll('.submission-mode').forEach(m => m.classList.remove('active'));
-      const modeDiv = document.getElementById(`${currentMode}-mode`);
-      if (modeDiv) {
-        modeDiv.classList.add('active');
-      }
-      
-      // Reset
-      const resultDiv = document.getElementById('submission-result');
-      if (resultDiv) {
-        resultDiv.style.display = 'none';
-      }
-      
-      // If switching to auto, check wallet and load tokens
-      if (currentMode === 'auto') {
-        console.log("🔄 Auto mode activated");
-        checkWalletAndLoadTokens();
-      }
-    });
-  });
-}
+const autoMode = document.getElementById('auto-mode');
+const manualMode = document.getElementById('manual-mode');
 
-// AUTO MODE: Load user's tokens
-async function loadUserTokens(userAddress) {
-  console.log("🔍 Loading tokens for address:", userAddress);
+modeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const mode = btn.dataset.mode;
+    
+    modeBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    if (mode === 'auto') {
+      autoMode.classList.add('active');
+      manualMode.classList.remove('active');
+      loadUserTokens();
+    } else {
+      manualMode.classList.add('active');
+      autoMode.classList.remove('active');
+    }
+  });
+});
+
+// AUTO MODE - Load user's tokens
+async function loadUserTokens() {
+  const autoTokenInfo = document.getElementById('auto-token-info');
+  const autoForm = document.getElementById('auto-form');
   
-  const infoDiv = document.getElementById('auto-token-info');
-  const formDiv = document.getElementById('auto-form');
-  
-  if (!infoDiv || !formDiv) {
-    console.error("Required elements not found");
+  if (!window.ethereum) {
+    autoTokenInfo.innerHTML = '<p class="error-text">❌ MetaMask not detected. Please install MetaMask.</p>';
     return;
   }
   
   try {
-    infoDiv.innerHTML = '<p class="loading-text">🔍 Searching for your tokens...</p>';
+    const accounts = await web3.eth.getAccounts();
     
-    const factory = new web3.eth.Contract(FACTORY_ABI, FACTORY_ADDRESS);
-    console.log("📡 Fetching all deployed tokens...");
-    
-    const allTokens = await factory.methods.getDeployedTokens().call();
-    console.log("📊 Total tokens found:", allTokens.length);
-    
-    // Get user's tokens by checking each one
-    const userTokens = [];
-    const tokensToCheck = Math.min(10, allTokens.length);
-    
-    console.log(`🔎 Checking last ${tokensToCheck} tokens for your balance...`);
-    
-    for (let i = allTokens.length - 1; i >= Math.max(0, allTokens.length - tokensToCheck); i--) {
-      try {
-        const tokenAddress = allTokens[i];
-        console.log(`  Checking token ${i + 1}/${allTokens.length}:`, tokenAddress);
-        
-        const tokenContract = new web3.eth.Contract(ERC20_ABI, tokenAddress);
-        
-        // Check balance (creator should have supply)
-        const balance = await tokenContract.methods.balanceOf(userAddress).call();
-        console.log(`    Balance:`, balance);
-        
-        if (BigInt(balance) > 0) {
-          console.log(`    ✅ Found token with balance!`);
-          
-          const [name, symbol, decimals] = await Promise.all([
-            tokenContract.methods.name().call(),
-            tokenContract.methods.symbol().call(),
-            tokenContract.methods.decimals().call()
-          ]);
-          
-          userTokens.push({
-            address: web3.utils.toChecksumAddress(tokenAddress),
-            name,
-            symbol,
-            decimals: Number(decimals)
-          });
-          
-          console.log(`    Token details:`, { name, symbol, decimals });
-        }
-      } catch (err) {
-        console.error('    ❌ Error checking token:', err);
-      }
-    }
-    
-    console.log("📋 User tokens found:", userTokens.length);
-    
-    if (userTokens.length === 0) {
-      console.log("⚠️ No tokens found for user");
-      infoDiv.innerHTML = `
-        <div class="no-tokens-found">
-          <p>❌ No tokens found for your wallet</p>
-          <p>Make sure you:</p>
-          <ul>
-            <li>Minted a token on MintonShardeum</li>
-            <li>Are connected with the same wallet</li>
-            <li>Are on Shardeum EVM Testnet (Chain ID: 8119)</li>
-          </ul>
-          <p><strong>Try:</strong> Switch to Manual mode instead</p>
-        </div>
-      `;
-      formDiv.style.display = 'none';
+    if (accounts.length === 0) {
+      autoTokenInfo.innerHTML = '<p class="loading-text">🔍 Please connect your MetaMask wallet to detect your tokens...</p>';
       return;
     }
     
-    // Show token selection if multiple
-    if (userTokens.length === 1) {
-      console.log("✅ Auto-selecting single token");
-      selectToken(userTokens[0]);
-    } else {
-      console.log("🎯 Showing token selector for", userTokens.length, "tokens");
-      showTokenSelector(userTokens);
+    const userAddress = accounts[0];
+    autoTokenInfo.innerHTML = '<p class="loading-text">⏳ Loading your tokens...</p>';
+    
+    const config = await getCurrentNetworkConfig();
+    const factory = new web3.eth.Contract(factoryABI, config.factoryAddress);
+    
+    let allTokens;
+    try {
+      allTokens = await factory.methods.getDeployedTokens().call();
+    } catch (error) {
+      console.error('Error calling getDeployedTokens:', error);
+      autoTokenInfo.innerHTML = `
+        <p class="error-text">❌ Failed to load tokens from ${config.chainName}</p>
+        <p style="font-size: 14px; color: #666;">Make sure you're connected to the correct network.</p>
+        <p style="font-size: 14px; color: #666;">Factory: ${config.factoryAddress}</p>
+      `;
+      return;
     }
     
+    if (!allTokens || allTokens.length === 0) {
+      autoTokenInfo.innerHTML = '<p class="error-text">No tokens found on this network.</p>';
+      return;
+    }
+    
+    const userTokens = [];
+    
+    for (const tokenAddress of allTokens) {
+      try {
+        const token = new web3.eth.Contract(tokenABI, tokenAddress);
+        const owner = await token.methods.owner().call();
+        
+        if (owner.toLowerCase() === userAddress.toLowerCase()) {
+          const name = await token.methods.name().call();
+          const symbol = await token.methods.symbol().call();
+          const decimals = await token.methods.decimals().call();
+          
+          userTokens.push({
+            address: tokenAddress,
+            name,
+            symbol,
+            decimals
+          });
+        }
+      } catch (error) {
+        console.error(`Error checking token ${tokenAddress}:`, error);
+      }
+    }
+    
+    if (userTokens.length === 0) {
+      autoTokenInfo.innerHTML = `
+        <p class="error-text">❌ No tokens found for your address</p>
+        <p style="font-size: 14px; color: #666;">Please use Manual mode or create a token first.</p>
+      `;
+      return;
+    }
+    
+    // Show first token
+    const firstToken = userTokens[0];
+    displayAutoToken(firstToken);
+    
   } catch (error) {
-    console.error('❌ Error loading tokens:', error);
-    infoDiv.innerHTML = `
-      <div class="error-message">
-        <p>❌ Failed to load tokens</p>
-        <p>Error: ${error.message}</p>
-        <p>Please try Manual mode or refresh the page</p>
-      </div>
+    console.error('Error loading tokens:', error);
+    autoTokenInfo.innerHTML = `
+      <p class="error-text">❌ Failed to load tokens</p>
+      <p style="font-size: 14px; color: #666;">${error.message}</p>
+      <p style="font-size: 14px; color: #666;">Please try Manual mode or refresh the page</p>
     `;
   }
 }
 
-function showTokenSelector(tokens) {
-  console.log("📋 Displaying token selector");
-  const infoDiv = document.getElementById('auto-token-info');
+function displayAutoToken(token) {
+  const autoTokenInfo = document.getElementById('auto-token-info');
+  const autoForm = document.getElementById('auto-form');
   
-  if (!infoDiv) return;
+  document.getElementById('auto-name').textContent = token.name;
+  document.getElementById('auto-symbol').textContent = token.symbol;
+  document.getElementById('auto-address').textContent = token.address;
+  document.getElementById('auto-decimals').textContent = token.decimals;
   
-  let html = '<div class="token-selector"><h3>Select Your Token:</h3>';
-  tokens.forEach((token, index) => {
-    html += `
-      <div class="token-option" onclick="selectTokenByIndex(${index})">
-        <div class="token-option-info">
-          <strong>${token.symbol}</strong> - ${token.name}
-          <br><small>${token.address}</small>
-        </div>
-        <button class="btn-select">Select →</button>
-      </div>
-    `;
-  });
-  html += '</div>';
+  autoTokenInfo.style.display = 'none';
+  autoForm.style.display = 'block';
   
-  infoDiv.innerHTML = html;
-  
-  // Store tokens globally for selection
-  window.availableTokens = tokens;
-  console.log("✅ Token selector displayed");
+  window.currentAutoToken = token;
 }
 
-window.selectTokenByIndex = function(index) {
-  console.log("🎯 Token selected:", index);
-  selectToken(window.availableTokens[index]);
-};
-
-function selectToken(token) {
-  console.log("✅ Selecting token:", token);
-  tokenData = token;
-  
-  const nameEl = document.getElementById('auto-name');
-  const symbolEl = document.getElementById('auto-symbol');
-  const addressEl = document.getElementById('auto-address');
-  const decimalsEl = document.getElementById('auto-decimals');
-  
-  if (nameEl) nameEl.textContent = token.name;
-  if (symbolEl) symbolEl.textContent = token.symbol;
-  if (addressEl) addressEl.textContent = token.address;
-  if (decimalsEl) decimalsEl.textContent = token.decimals;
-  
-  const infoDiv = document.getElementById('auto-token-info');
-  const formDiv = document.getElementById('auto-form');
-  
-  if (infoDiv) infoDiv.style.display = 'none';
-  if (formDiv) formDiv.style.display = 'block';
-  
-  console.log("📝 Token form displayed");
-}
-
-// AUTO MODE: Logo Upload
+// Logo validation for AUTO mode
 const autoLogoFile = document.getElementById('auto-logo-file');
+const autoLogoPreview = document.getElementById('auto-logo-preview');
+const autoLogoValidation = document.getElementById('auto-logo-validation');
+const autoSubmitBtn = document.getElementById('auto-submit-btn');
+
 if (autoLogoFile) {
-  autoLogoFile.addEventListener('change', (e) => {
-    console.log("📷 Logo file selected (auto mode)");
-    handleLogoUpload(e, 'auto');
+  autoLogoFile.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const validation = await validateLogo(file);
+    
+    if (validation.valid) {
+      autoLogoPreview.innerHTML = `<img src="${validation.dataUrl}" alt="Logo preview" style="width: 100%; height: 100%; object-fit: contain;">`;
+      autoLogoValidation.innerHTML = '<p style="color: #48bb78;">✅ Logo looks good!</p>';
+      autoSubmitBtn.disabled = false;
+      window.autoLogoData = validation.dataUrl;
+    } else {
+      autoLogoPreview.innerHTML = '<span class="upload-placeholder">📷<br>Click to upload<br>256x256 PNG</span>';
+      autoLogoValidation.innerHTML = `<p style="color: #FF6B6B;">❌ ${validation.error}</p>`;
+      autoSubmitBtn.disabled = true;
+      window.autoLogoData = null;
+    }
   });
 }
 
-// AUTO MODE: Submit
-const autoSubmitBtn = document.getElementById('auto-submit-btn');
+// Logo validation for MANUAL mode
+const manualLogoFile = document.getElementById('manual-logo-file');
+const manualLogoPreview = document.getElementById('manual-logo-preview');
+const manualLogoValidation = document.getElementById('manual-logo-validation');
+const manualSubmitBtn = document.getElementById('manual-submit-btn');
+
+if (manualLogoFile) {
+  manualLogoFile.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const validation = await validateLogo(file);
+    
+    if (validation.valid) {
+      manualLogoPreview.innerHTML = `<img src="${validation.dataUrl}" alt="Logo preview" style="width: 100%; height: 100%; object-fit: contain;">`;
+      manualLogoValidation.innerHTML = '<p style="color: #48bb78;">✅ Logo looks good!</p>';
+      manualSubmitBtn.disabled = false;
+      window.manualLogoData = validation.dataUrl;
+    } else {
+      manualLogoPreview.innerHTML = '<span class="upload-placeholder">📷<br>Click to upload<br>256x256 PNG</span>';
+      manualLogoValidation.innerHTML = `<p style="color: #FF6B6B;">❌ ${validation.error}</p>`;
+      manualSubmitBtn.disabled = true;
+      window.manualLogoData = null;
+    }
+  });
+}
+
+async function validateLogo(file) {
+  if (!file.type.match('image/png')) {
+    return { valid: false, error: 'File must be PNG format' };
+  }
+  
+  if (file.size > 200 * 1024) {
+    return { valid: false, error: 'File must be under 200KB' };
+  }
+  
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.width === 256 && img.height === 256) {
+          resolve({ valid: true, dataUrl: e.target.result });
+        } else {
+          resolve({ valid: false, error: `Image must be exactly 256x256 pixels (yours is ${img.width}x${img.height})` });
+        }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// AUTO mode submit
 if (autoSubmitBtn) {
   autoSubmitBtn.addEventListener('click', () => {
-    console.log("🚀 Auto submit clicked");
-    if (!tokenData.address || !logoFile) {
-      console.error("❌ Missing data:", { tokenData, logoFile });
-      alert('Missing token data or logo!');
-      return;
-    }
-    generateInstructions();
+    if (!window.currentAutoToken || !window.autoLogoData) return;
+    
+    const token = window.currentAutoToken;
+    showInstructions(token, window.autoLogoData);
   });
 }
 
-// MANUAL MODE: Verify
+// MANUAL mode - Verify contract
 const manualVerifyBtn = document.getElementById('manual-verify-btn');
+const manualAddressInput = document.getElementById('manual-address');
+const manualTokenInfo = document.getElementById('manual-token-info');
+const manualLogoSection = document.getElementById('manual-logo-section');
+
 if (manualVerifyBtn) {
   manualVerifyBtn.addEventListener('click', async () => {
-    console.log("🔍 Manual verify clicked");
-    const addressInput = document.getElementById('manual-address');
-    if (!addressInput) return;
+    const address = manualAddressInput.value.trim();
     
-    const address = addressInput.value.trim();
-    
-    if (!address || !web3.utils.isAddress(address)) {
-      alert('Please enter a valid contract address!');
+    if (!address.match(/^0x[a-fA-F0-9]{40}$/)) {
+      alert('Invalid address format');
       return;
     }
     
-    const btn = manualVerifyBtn;
-    btn.textContent = '⏳ Verifying...';
-    btn.disabled = true;
+    manualVerifyBtn.textContent = '⏳ Verifying...';
+    manualVerifyBtn.disabled = true;
     
     try {
-      console.log("📡 Verifying token:", address);
-      const contract = new web3.eth.Contract(ERC20_ABI, address);
-      const [name, symbol, decimals] = await Promise.all([
-        contract.methods.name().call(),
-        contract.methods.symbol().call(),
-        contract.methods.decimals().call()
-      ]);
+      const token = new web3.eth.Contract(tokenABI, address);
       
-      console.log("✅ Token verified:", { name, symbol, decimals });
+      const name = await token.methods.name().call();
+      const symbol = await token.methods.symbol().call();
+      const decimals = await token.methods.decimals().call();
       
-      tokenData = {
-        address: web3.utils.toChecksumAddress(address),
-        name,
-        symbol,
-        decimals: Number(decimals)
-      };
+      document.getElementById('manual-name').textContent = name;
+      document.getElementById('manual-symbol').textContent = symbol;
+      document.getElementById('manual-decimals').textContent = decimals;
       
-      const nameEl = document.getElementById('manual-name');
-      const symbolEl = document.getElementById('manual-symbol');
-      const decimalsEl = document.getElementById('manual-decimals');
+      manualTokenInfo.style.display = 'block';
+      manualLogoSection.style.display = 'block';
       
-      if (nameEl) nameEl.textContent = name;
-      if (symbolEl) symbolEl.textContent = symbol;
-      if (decimalsEl) decimalsEl.textContent = decimals;
+      window.currentManualToken = { address, name, symbol, decimals };
       
-      const infoDiv = document.getElementById('manual-token-info');
-      const logoSection = document.getElementById('manual-logo-section');
-      
-      if (infoDiv) infoDiv.style.display = 'block';
-      if (logoSection) logoSection.style.display = 'block';
-      
-      alert(`✅ Token verified!\n\nName: ${name}\nSymbol: ${symbol}`);
+      manualVerifyBtn.textContent = '✅ Verified';
+      setTimeout(() => {
+        manualVerifyBtn.textContent = '🔍 Verify Contract';
+        manualVerifyBtn.disabled = false;
+      }, 2000);
       
     } catch (error) {
-      console.error("❌ Verification failed:", error);
-      alert('❌ Failed to verify token. Make sure:\n- Address is correct\n- Contract is on Shardeum testnet\n- Contract implements ERC-20');
-    } finally {
-      btn.textContent = '🔍 Verify Contract';
-      btn.disabled = false;
+      alert('Failed to verify contract. Make sure it\'s a valid ERC-20 token.');
+      manualVerifyBtn.textContent = '🔍 Verify Contract';
+      manualVerifyBtn.disabled = false;
     }
   });
 }
 
-// MANUAL MODE: Logo Upload
-const manualLogoFile = document.getElementById('manual-logo-file');
-if (manualLogoFile) {
-  manualLogoFile.addEventListener('change', (e) => {
-    console.log("📷 Logo file selected (manual mode)");
-    handleLogoUpload(e, 'manual');
-  });
-}
-
-// MANUAL MODE: Submit
+// MANUAL mode submit
 const manualForm = document.getElementById('manual-form');
 if (manualForm) {
   manualForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    console.log("🚀 Manual submit clicked");
-    if (!tokenData.address || !logoFile) {
-      alert('Please verify token and upload logo!');
-      return;
-    }
-    generateInstructions();
+    
+    if (!window.currentManualToken || !window.manualLogoData) return;
+    
+    showInstructions(window.currentManualToken, window.manualLogoData);
   });
 }
 
-// Shared Logo Upload Handler
-function handleLogoUpload(e, mode) {
-  console.log(`📷 Handling logo upload for ${mode} mode`);
-  const file = e.target.files[0];
-  if (!file) return;
+function showInstructions(token, logoData) {
+  const result = document.getElementById('submission-result');
   
-  const validationDiv = document.getElementById(`${mode}-logo-validation`);
-  const previewDiv = document.getElementById(`${mode}-logo-preview`);
-  const submitBtn = document.getElementById(`${mode}-submit-btn`);
+  const fileName = `${token.symbol.toLowerCase()}.png`;
   
-  if (!validationDiv || !previewDiv || !submitBtn) {
-    console.error("Required elements not found");
-    return;
-  }
-  
-  validationDiv.innerHTML = '';
-  validationDiv.className = 'validation-message';
-  submitBtn.disabled = true;
-  logoFile = null;
-  logoDataUrl = null;
-  
-  console.log("📊 File info:", { name: file.name, type: file.type, size: file.size });
-  
-  if (file.type !== 'image/png') {
-    console.error("❌ Wrong file type:", file.type);
-    validationDiv.innerHTML = '❌ Must be PNG format';
-    validationDiv.className = 'validation-message error';
-    e.target.value = '';
-    previewDiv.innerHTML = '<span class="upload-placeholder">📷<br>Click to upload<br>256x256 PNG</span>';
-    return;
-  }
-  
-  if (file.size > 200 * 1024) {
-    console.error("❌ File too large:", file.size);
-    validationDiv.innerHTML = `❌ File too large: ${(file.size / 1024).toFixed(0)}KB (max 200KB)`;
-    validationDiv.className = 'validation-message error';
-    e.target.value = '';
-    previewDiv.innerHTML = '<span class="upload-placeholder">📷<br>Click to upload<br>256x256 PNG</span>';
-    return;
-  }
-  
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    const img = new Image();
-    img.onload = () => {
-      console.log("📐 Image dimensions:", img.width, "x", img.height);
-      
-      if (img.width !== 256 || img.height !== 256) {
-        console.error("❌ Wrong dimensions");
-        validationDiv.innerHTML = `❌ Must be 256x256px (yours: ${img.width}x${img.height}px)`;
-        validationDiv.className = 'validation-message error';
-        e.target.value = '';
-        previewDiv.innerHTML = '<span class="upload-placeholder">📷<br>Click to upload<br>256x256 PNG</span>';
-        return;
-      }
-      
-      logoFile = file;
-      logoDataUrl = event.target.result;
-      
-      console.log("✅ Logo validated successfully");
-      
-      validationDiv.innerHTML = `✅ Perfect! ${(file.size / 1024).toFixed(1)}KB`;
-      validationDiv.className = 'validation-message success';
-      previewDiv.innerHTML = `<img src="${logoDataUrl}" alt="Logo">`;
-      submitBtn.disabled = false;
-    };
-    img.src = event.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-// Generate Instructions - SIMPLIFIED VERSION
-function generateInstructions() {
-  console.log("📝 Generating instructions for:", tokenData);
-  
-  const logoFileName = `${tokenData.address}.png`;
-  
-  const tokenEntry = {
-    address: tokenData.address,
-    name: tokenData.name,
-    symbol: tokenData.symbol,
-    decimals: tokenData.decimals,
-    logoURI: `https://raw.githubusercontent.com/BrunoMarshall/MintonDex/main/logos/${logoFileName}`
+  const jsonEntry = {
+    "name": token.name,
+    "address": token.address,
+    "symbol": token.symbol,
+    "decimals": parseInt(token.decimals),
+    "chainId": currentNetwork === 'TESTNET' ? 8119 : 8118,
+    "logoURI": `https://raw.githubusercontent.com/BrunoMarshall/mintonshardeum/main/tokens/logos/${fileName}`
   };
   
-  const jsonString = JSON.stringify(tokenEntry, null, 2);
-  const jsonWithComma = ',\n' + jsonString.split('\n').map(line => '    ' + line).join('\n');
-  
-  const instructions = `
-<div class="submission-instructions-simple">
-  <div class="success-banner">
-    <h2>📋 Ready to Submit!</h2>
-    <p>Follow these 2 simple steps to list <strong>${tokenData.symbol}</strong></p>
-  </div>
-  
-  <div class="what-is-pr-box">
-    <h3>❓ What's a "Pull Request"?</h3>
-    <p>It's GitHub's way of suggesting changes. You'll upload your logo and add your token info, then we review and approve - usually within 24 hours!</p>
-  </div>
-  
-  <div class="step-box">
-    <div class="step-header">
-      <span class="step-num">1</span>
-      <h3>Upload Logo to GitHub</h3>
-    </div>
-    
-    <div class="step-content">
-      <p><strong>Upload your logo with the correct name: <code>${logoFileName}</code></strong></p>
+  result.innerHTML = `
+    <div style="background: #f8f9fa; padding: 30px; border-radius: 12px; margin-top: 30px;">
+      <h2 style="color: #48bb78;">✅ Ready to Submit!</h2>
       
-      <ol class="simple-steps">
-        <li>Click here: <a href="https://github.com/BrunoMarshall/MintonDex/upload/main/logos" target="_blank" class="inline-link">Upload to MintonDex/logos ↗</a></li>
-        <li>Rename your file to: <code>${logoFileName}</code></li>
-        <li>Drag and drop your logo or click "choose your files"</li>
-        <li>Scroll down and click <strong>"Propose changes"</strong></li>
-        <li>Click the green <strong>"Create pull request"</strong> button</li>
+      <h3 style="margin-top: 30px;">📝 Step 2: Upload Logo to GitHub</h3>
+      <ol style="line-height: 2; text-align: left;">
+        <li>Go to: <a href="https://github.com/BrunoMarshall/mintonshardeum/tree/main/tokens/logos" target="_blank" style="color: #0024F1;">GitHub Logos Folder</a></li>
+        <li>Click "Add file" → "Upload files"</li>
+        <li>Download your validated logo: <button onclick="downloadLogo('${logoData}', '${fileName}')" style="background: #48bb78; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-left: 10px;">📥 Download ${fileName}</button></li>
+        <li>Upload the downloaded file to GitHub</li>
+        <li>Commit with message: "Add ${token.symbol} logo"</li>
       </ol>
       
-      <div class="tip-box">
-        💡 <strong>Tip:</strong> GitHub might ask you to "fork" the repository - just click "Fork this repository" when prompted. This is normal!
-      </div>
-    </div>
-  </div>
-  
-  <div class="step-box">
-    <div class="step-header">
-      <span class="step-num">2</span>
-      <h3>Add Token to List</h3>
-    </div>
-    
-    <div class="step-content">
-      <p><strong>Copy your token's JSON:</strong></p>
-      <div class="code-box-simple">
-        <div class="code-actions">
-          <button class="btn-copy-code" onclick="copyCode()">📋 Copy Token Entry</button>
-        </div>
-        <pre><code id="token-json">${escapeHtml(jsonWithComma)}</code></pre>
-      </div>
-      
-      <p style="margin-top: 20px;"><strong>Add it to the token list:</strong></p>
-      <ol class="simple-steps">
-        <li>Click here: <a href="https://github.com/BrunoMarshall/MintonDex/edit/main/tokenlist.json" target="_blank" class="inline-link">Edit tokenlist.json ↗</a></li>
-        <li>Scroll to the bottom, find the last token entry</li>
-        <li><strong>Important:</strong> Add a comma after the last <code>}</code></li>
-        <li>Paste your copied JSON</li>
-        <li>Scroll down and click <strong>"Propose changes"</strong></li>
-        <li>Click the green <strong>"Create pull request"</strong> button</li>
+      <h3 style="margin-top: 30px;">📝 Step 3: Add Token to List</h3>
+      <ol style="line-height: 2; text-align: left;">
+        <li>Go to: <a href="https://github.com/BrunoMarshall/mintonshardeum/blob/main/tokens/tokenlist.json" target="_blank" style="color: #0024F1;">tokenlist.json</a></li>
+        <li>Click the "Edit" (pencil) icon</li>
+        <li>Copy this JSON and add it to the "tokens" array:</li>
       </ol>
       
-      <div class="warning-note">
-        ⚠️ <strong>Don't forget the comma!</strong> It should look like:
-        <pre style="font-size: 0.85rem; margin-top: 10px;">  },  ← Add comma here!
-  {
-    "address": "YOUR_ADDRESS",
-    ...</pre>
+      <div style="background: #2d3748; color: #e2e8f0; padding: 20px; border-radius: 8px; margin: 20px 0; position: relative;">
+        <button onclick="copyJSON()" style="position: absolute; top: 10px; right: 10px; background: #48bb78; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">📋 Copy</button>
+        <pre id="json-code" style="margin: 0; overflow-x: auto; white-space: pre-wrap;">${JSON.stringify(jsonEntry, null, 2)}</pre>
       </div>
+      
+      <ol start="4" style="line-height: 2; text-align: left;">
+        <li>Commit changes with message: "Add ${token.symbol} to tokenlist"</li>
+        <li>Create Pull Request</li>
+        <li>Wait for approval!</li>
+      </ol>
+      
+      <p style="margin-top: 30px; padding: 15px; background: #e6f7ff; border-left: 4px solid #0024F1; border-radius: 4px;">
+        💡 <strong>Need help?</strong> Join our <a href="https://discord.com/invite/shardeum" target="_blank" style="color: #0024F1;">Discord</a> for support!
+      </p>
     </div>
-  </div>
-  
-  <div class="final-note">
-    <h3>✅ Done!</h3>
-    <p>You created 2 Pull Requests. We'll review and approve within <strong>24 hours</strong>!</p>
-    
-    <div class="token-summary-box">
-      <h4>Your Token:</h4>
-      <p><strong>${tokenData.symbol}</strong> - ${tokenData.name}</p>
-      <p><code>${tokenData.address}</code></p>
-      <a href="https://explorer-mezame.shardeum.org/address/${tokenData.address}" target="_blank">View on Explorer ↗</a>
-    </div>
-  </div>
-  
-  <div class="help-box">
-    <h3>Need Help?</h3>
-    <p>
-      <a href="https://github.com/BrunoMarshall/MintonDex/issues/new" target="_blank">📝 Open GitHub Issue</a> •
-      <a href="https://discord.com/invite/shardeum" target="_blank">💬 Discord Support</a>
-    </p>
-  </div>
-</div>
   `;
   
-  const resultDiv = document.getElementById('submission-result');
-  if (!resultDiv) return;
-  
-  resultDiv.innerHTML = instructions;
-  resultDiv.style.display = 'block';
-  
-  console.log("✅ Instructions generated and displayed");
-  
-  setTimeout(() => {
-    resultDiv.scrollIntoView({ behavior: 'smooth' });
-  }, 100);
+  result.style.display = 'block';
+  result.scrollIntoView({ behavior: 'smooth' });
 }
 
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+function downloadLogo(dataUrl, fileName) {
+  const link = document.createElement('a');
+  link.href = dataUrl;
+  link.download = fileName;
+  link.click();
 }
 
-function copyCode() {
-  const codeEl = document.getElementById('token-json');
-  if (!codeEl) return;
-  
-  const code = codeEl.textContent;
+function copyJSON() {
+  const code = document.getElementById('json-code').textContent;
   navigator.clipboard.writeText(code).then(() => {
-    const btn = event.target;
-    const original = btn.textContent;
-    btn.textContent = '✅ Copied!';
-    btn.style.background = '#00C851';
-    setTimeout(() => {
-      btn.textContent = original;
-      btn.style.background = '';
-    }, 2000);
-    console.log("✅ Code copied to clipboard");
-  }).catch(err => {
-    console.error("Copy failed:", err);
-    alert('Failed to copy. Please select and copy manually.');
+    alert('✅ JSON copied to clipboard!');
   });
 }
 
-window.copyCode = copyCode;
+// Network toggle and wallet connection
+const networkToggle = document.getElementById('network-toggle');
+const networkIndicator = document.getElementById('network-indicator');
 
-// Initialize on page load
-window.addEventListener("load", () => {
-  console.log("🎬 Submit token page loaded");
-  setTimeout(checkWalletAndLoadTokens, 500);
+function updateNetworkIndicator() {
+  if (!networkIndicator) return;
+  
+  if (currentNetwork === 'TESTNET') {
+    networkIndicator.textContent = '🔧 TESTNET';
+    networkIndicator.className = 'network-indicator testnet';
+    document.body.classList.remove('mainnet-mode');
+    document.body.classList.add('testnet-mode');
+  } else {
+    networkIndicator.textContent = '🟢 MAINNET';
+    networkIndicator.className = 'network-indicator mainnet';
+    document.body.classList.remove('testnet-mode');
+    document.body.classList.add('mainnet-mode');
+  }
+}
+
+if (networkToggle) {
+  networkToggle.addEventListener('change', async (e) => {
+    currentNetwork = e.target.checked ? 'TESTNET' : 'MAINNET';
+    updateNetworkIndicator();
+    
+    const config = NETWORKS[currentNetwork];
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: config.chainId }]
+      });
+      
+      // Reload tokens if in auto mode
+      if (autoMode.classList.contains('active')) {
+        loadUserTokens();
+      }
+    } catch (error) {
+      console.error("Error switching network:", error);
+    }
+  });
+}
+
+// Initialize on load
+window.addEventListener('load', async () => {
+  updateNetworkIndicator();
+  
+  if (window.ethereum) {
+    const chainId = Number(await web3.eth.getChainId());
+    
+    if (chainId === NETWORKS.MAINNET.chainIdNumber) {
+      currentNetwork = 'MAINNET';
+      if (networkToggle) networkToggle.checked = false;
+    } else if (chainId === NETWORKS.TESTNET.chainIdNumber) {
+      currentNetwork = 'TESTNET';
+      if (networkToggle) networkToggle.checked = true;
+    }
+    
+    updateNetworkIndicator();
+    loadUserTokens();
+    
+    window.ethereum.on('accountsChanged', () => {
+      if (autoMode.classList.contains('active')) {
+        loadUserTokens();
+      }
+    });
+    
+    window.ethereum.on('chainChanged', () => {
+      window.location.reload();
+    });
+  }
 });
-
-console.log("✅ Token submission script loaded");
