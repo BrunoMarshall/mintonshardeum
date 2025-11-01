@@ -808,3 +808,200 @@ footer {
     animation: spin 1s linear infinite;
     margin-right: 8px;
 }
+
+/* Network Indicator Styling */
+.network-toggle-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 12px 20px;
+  border-radius: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.network-indicator {
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 15px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.network-indicator.testnet {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+.network-indicator.mainnet {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+  box-shadow: 0 2px 10px rgba(17, 153, 142, 0.3);
+}
+
+/* Toggle Switch Styling */
+.network-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+}
+
+.network-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: 0.4s;
+  border-radius: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked + .slider {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+input:checked + .slider:before {
+  transform: translateX(30px);
+}
+
+/* Body background transitions */
+body.testnet-mode {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: background 0.5s ease;
+}
+
+body.mainnet-mode {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  transition: background 0.5s ease;
+}
+
+/* Optional: Subtle overlay for better contrast */
+body.testnet-mode::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(102, 126, 234, 0.05);
+  pointer-events: none;
+  z-index: -1;
+}
+
+body.mainnet-mode::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(17, 153, 142, 0.05);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Network labels */
+.network-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .network-toggle-container {
+    top: 10px;
+    right: 10px;
+    padding: 10px 15px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .network-indicator {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  .network-switch {
+    width: 50px;
+    height: 25px;
+  }
+  
+  .slider:before {
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3.5px;
+  }
+  
+  input:checked + .slider:before {
+    transform: translateX(25px);
+  }
+}
+
+/* Alert/Warning styling for network mismatch */
+.network-warning {
+  background: #FFF3CD;
+  border: 2px solid #FFC107;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 20px 0;
+  color: #856404;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Success message styling by network */
+#status.testnet-success {
+  color: #667eea !important;
+  border-left: 4px solid #667eea;
+}
+
+#status.mainnet-success {
+  color: #11998e !important;
+  border-left: 4px solid #11998e;
+}
+

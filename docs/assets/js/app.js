@@ -27,7 +27,7 @@ const NETWORKS = {
     },
     rpcUrls: ['https://api.shardeum.org/'],
     blockExplorerUrls: ['https://explorer.shardeum.org/'],
-    factoryAddress: '0x294665ec45ab8668d922474f63a03e33416d8deb', // Mainnet factory
+    factoryAddress: '0xYOUR_MAINNET_FACTORY_ADDRESS_HERE', // You'll update this after deployment
     explorerUrl: 'https://explorer.shardeum.org'
   }
 };
